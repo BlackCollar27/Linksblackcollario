@@ -245,8 +245,9 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed, onDesktopToggle }
 
       {/* Toggle Button - Desktop Only */}
       <button
+        type="button"
         onClick={onDesktopToggle}
-        className={`hidden lg:flex fixed top-[97px] z-50 items-center justify-center w-8 h-8 bg-card hover:bg-muted rounded-full shadow-lg transition-all duration-300 ${isDesktopCollapsed ? 'left-[52px]' : 'left-[248px]'}`}
+        className={`hidden lg:flex fixed top-[75px] z-50 items-center justify-center w-8 h-8 bg-card hover:bg-muted rounded-full shadow-lg transition-all duration-300 ${isDesktopCollapsed ? 'left-[52px]' : 'left-[248px]'}`}
         title={isDesktopCollapsed ? 'Open sidebar' : 'Close sidebar'}
       >
         {isDesktopCollapsed ? (

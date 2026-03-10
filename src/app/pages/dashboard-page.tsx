@@ -218,7 +218,7 @@ export function DashboardPage() {
           </p>
 
           {/* Link Shortener Form */}
-          <div className="bg-card/50 backdrop-blur-md rounded-lg p-4 mb-6 w-full bg-[#0a0a0a00]">
+          <div className="bg-card/50 backdrop-blur-md rounded-lg p-4 mb-6 w-full bg-[#ffffff00]">
             <Tabs defaultValue="single" className="w-full">
               <TabsList className="w-full mb-4 grid grid-cols-2 h-auto gap-2 p-2 bg-muted/50 dark:bg-muted/20">
                 <TabsTrigger value="single" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">

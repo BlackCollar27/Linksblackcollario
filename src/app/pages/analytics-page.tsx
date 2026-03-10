@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router';
 import { useAuth } from '../contexts/auth-context';
 import { AppLayout } from '../components/app-layout';
 import { Button } from '../components/ui/button';
-import { ArrowLeft, Copy, ExternalLink, Calendar, TrendingUp, MousePointerClick, Globe } from 'lucide-react';
+import { ArrowLeft, Copy, ExternalLink, Calendar, TrendingUp, MousePointerClick, FolderKanban } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export function AnalyticsPage() {
@@ -37,12 +37,12 @@ export function AnalyticsPage() {
     { name: 'Tablet', value: 177, color: '#FBBC05' },
   ];
 
-  const locationData = [
-    { country: 'United States', clicks: 425 },
-    { country: 'United Kingdom', clicks: 312 },
-    { country: 'Canada', clicks: 198 },
-    { country: 'Germany', clicks: 145 },
-    { country: 'Australia', clicks: 167 },
+  const campaignData = [
+    { campaign: 'Spring Sale 2026', clicks: 425 },
+    { campaign: 'Product Launch', clicks: 312 },
+    { campaign: 'Summer Campaign', clicks: 298 },
+    { campaign: 'Holiday Promo', clicks: 145 },
+    { campaign: 'Newsletter Feb', clicks: 67 },
   ];
 
   const referrerData = [
@@ -59,7 +59,9 @@ export function AnalyticsPage() {
 
   return (
     <AppLayout>
-      <div className="px-4 py-8 max-w-7xl mx-auto">
+      <div className="min-h-screen bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        <div className="px-4 py-8 max-w-7xl mx-auto relative">
         {/* Back Button */}
         <Button 
           variant="ghost" 
@@ -71,7 +73,7 @@ export function AnalyticsPage() {
         </Button>
 
         {/* Link Details Header */}
-        <div className="border border-border rounded-lg p-6 mb-8">
+        <div className="bg-card rounded-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-2xl font-bold mb-2">Link Analytics</h1>
@@ -98,28 +100,28 @@ export function AnalyticsPage() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="border border-border rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-green-500" />
               <span className="text-sm text-muted-foreground">Avg. Daily Clicks</span>
             </div>
             <p className="text-2xl font-bold">178</p>
           </div>
-          <div className="border border-border rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <MousePointerClick className="w-5 h-5 text-blue-500" />
               <span className="text-sm text-muted-foreground">Peak Day</span>
             </div>
             <p className="text-2xl font-bold">203</p>
           </div>
-          <div className="border border-border rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Globe className="w-5 h-5 text-purple-500" />
+              <FolderKanban className="w-5 h-5 text-purple-500" />
               <span className="text-sm text-muted-foreground">Countries</span>
             </div>
             <p className="text-2xl font-bold">24</p>
           </div>
-          <div className="border border-border rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Calendar className="w-5 h-5 text-orange-500" />
               <span className="text-sm text-muted-foreground">Active Days</span>
@@ -129,7 +131,7 @@ export function AnalyticsPage() {
         </div>
 
         {/* Clicks Over Time Chart */}
-        <div className="border border-border rounded-lg p-6 mb-8">
+        <div className="bg-card rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Clicks Over Time</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={clicksOverTime}>
@@ -151,7 +153,7 @@ export function AnalyticsPage() {
         {/* Device & Location Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Device Breakdown */}
-          <div className="border border-border rounded-lg p-6">
+          <div className="bg-card rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Device Breakdown</h2>
             <div className="flex items-center justify-center mb-4">
               <ResponsiveContainer width="100%" height={250}>
@@ -187,14 +189,14 @@ export function AnalyticsPage() {
             </div>
           </div>
 
-          {/* Top Locations */}
-          <div className="border border-border rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Top Locations</h2>
+          {/* Top Campaigns */}
+          <div className="bg-card rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Top Campaigns</h2>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={locationData} layout="horizontal">
+              <BarChart data={campaignData} layout="horizontal">
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis type="number" className="text-xs" />
-                <YAxis dataKey="country" type="category" width={100} className="text-xs" />
+                <YAxis dataKey="campaign" type="category" width={100} className="text-xs" />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'hsl(var(--background))', 
@@ -208,7 +210,7 @@ export function AnalyticsPage() {
         </div>
 
         {/* Referrer Sources */}
-        <div className="border border-border rounded-lg p-6">
+        <div className="bg-card rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Referrer Sources</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={referrerData}>
@@ -225,6 +227,7 @@ export function AnalyticsPage() {
               <Bar dataKey="clicks" fill="#FBBC05" />
             </BarChart>
           </ResponsiveContainer>
+        </div>
         </div>
       </div>
     </AppLayout>

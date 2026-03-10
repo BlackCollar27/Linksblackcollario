@@ -11,7 +11,9 @@ import {
   Save,
   Trash2,
   Plus,
-  X
+  X,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface PoolEntry {
@@ -27,6 +29,7 @@ export function LinkEditPage() {
   // Mock data - replace with API call to Rails backend
   const [linkData] = useState({
     id: linkId || '1',
+    name: 'Spring Campaign Link',
     originalUrl: 'https://www.example.com/marketing-campaign',
     shortCode: 'spring24',
     shortUrl: 'blackcollar.io/spring24',
@@ -37,6 +40,7 @@ export function LinkEditPage() {
   });
 
   const [isRandomizer, setIsRandomizer] = useState(linkData.isRandomizer);
+  const [linkName, setLinkName] = useState(linkData.name);
   const [destinationUrl, setDestinationUrl] = useState(linkData.originalUrl);
   const [poolEntries, setPoolEntries] = useState<PoolEntry[]>([
     { id: '1', url: 'https://www.example.com/option-a', weight: 50 },
@@ -49,6 +53,11 @@ export function LinkEditPage() {
   const [utmCampaign, setUtmCampaign] = useState('');
   const [utmTerm, setUtmTerm] = useState('');
   const [utmContent, setUtmContent] = useState('');
+
+  // Collapsible sections state
+  const [isUtmOpen, setIsUtmOpen] = useState(false);
+  const [isCampaignOpen, setIsCampaignOpen] = useState(true);
+  const [isLinkTypeOpen, setIsLinkTypeOpen] = useState(true);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -113,7 +122,11 @@ export function LinkEditPage() {
 
   return (
     <AppLayout>
-      <div className="px-4 py-8 max-w-4xl mx-auto">
+      <div className="min-h-screen bg-background relative">
+        {/* Subtle background pattern for glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        
+        <div className="px-4 py-8 max-w-4xl mx-auto relative">
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -127,8 +140,8 @@ export function LinkEditPage() {
 
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Edit Link</h1>
-              <div className="flex items-center gap-2">
+              <h1 className="mb-2 text-center md:text-left text-[32px]">Edit Link</h1>
+              <div className="flex items-center gap-2 justify-center md:justify-start">
                 <span className="text-primary font-medium">
                   {linkData.shortUrl}
                 </span>
@@ -150,137 +163,212 @@ export function LinkEditPage() {
         </div>
 
         <div className="space-y-6">
-          {/* Link Type Toggle */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Link Type</h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <button
-                onClick={() => setIsRandomizer(false)}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  !isRandomizer
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border hover:border-muted-foreground'
-                }`}
-              >
-                <div className="font-medium mb-1">Single Destination</div>
-                <div className="text-sm text-muted-foreground">
-                  Link to one URL
-                </div>
-              </button>
-
-              <button
-                onClick={() => setIsRandomizer(true)}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  isRandomizer
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border hover:border-muted-foreground'
-                }`}
-              >
-                <div className="font-medium mb-1">Randomized Pool</div>
-                <div className="text-sm text-muted-foreground">
-                  Distribute to multiple URLs
-                </div>
-              </button>
+          {/* Link Name */}
+          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Link Name (Optional)</h2>
+            <div className="space-y-2">
+              
+              <Input
+                id="linkName"
+                type="text"
+                value={linkName}
+                onChange={(e) => setLinkName(e.target.value)}
+                placeholder="e.g., Spring Campaign Link"
+                className="h-11"
+              />
+              <p className="text-xs text-muted-foreground">Give this link a memorable name for easy identification</p>
             </div>
+          </div>
 
-            {/* Single Destination */}
-            {!isRandomizer && (
-              <div className="space-y-2">
-                <Label htmlFor="destination">Destination URL</Label>
-                <Input
-                  id="destination"
-                  type="url"
-                  value={destinationUrl}
-                  onChange={(e) => setDestinationUrl(e.target.value)}
-                  placeholder="https://example.com/destination"
-                  className="h-11"
-                />
-              </div>
-            )}
-
-            {/* Randomizer Pool */}
-            {isRandomizer && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label>URL Pool</Label>
-                  <span className="text-sm text-muted-foreground">
-                    Total weight: {totalWeight}%
-                  </span>
-                </div>
-
-                <div className="space-y-3">
-                  {poolEntries.map((entry, index) => (
-                    <div
-                      key={entry.id}
-                      className="flex gap-2 items-start p-3 bg-muted/30 rounded-lg"
-                    >
-                      <div className="flex-1 space-y-2">
-                        <Input
-                          type="url"
-                          placeholder="https://example.com/option"
-                          value={entry.url}
-                          onChange={(e) =>
-                            updatePoolEntry(entry.id, 'url', e.target.value)
-                          }
-                          className="h-10"
-                        />
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            placeholder="Weight %"
-                            value={entry.weight}
-                            onChange={(e) =>
-                              updatePoolEntry(entry.id, 'weight', parseInt(e.target.value) || 0)
-                            }
-                            min="0"
-                            max="100"
-                            className="h-10 w-24"
-                          />
-                          <span className="text-sm text-muted-foreground">
-                            % of traffic
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removePoolEntry(entry.id)}
-                        disabled={poolEntries.length <= 2}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
+          {/* Link Type Toggle */}
+          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg shadow-lg">
+            <button
+              onClick={() => setIsLinkTypeOpen(!isLinkTypeOpen)}
+              className="w-full p-6 flex items-center justify-between hover:bg-muted/10 transition-colors"
+            >
+              <h2 className="text-xl font-semibold">Link Destination</h2>
+              {isLinkTypeOpen ? (
+                <ChevronUp className="w-5 h-5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              )}
+            </button>
+            
+            {isLinkTypeOpen && (
+              <div className="px-6 pb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  <button
+                    onClick={() => setIsRandomizer(false)}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      !isRandomizer
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-muted-foreground'
+                    }`}
+                  >
+                    <div className="font-medium mb-1">Single Destination</div>
+                    <div className="text-sm text-muted-foreground">
+                      Link to one URL
                     </div>
-                  ))}
+                  </button>
+
+                  <button
+                    onClick={() => setIsRandomizer(true)}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      isRandomizer
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-muted-foreground'
+                    }`}
+                  >
+                    <div className="font-medium mb-1">Randomized Pool</div>
+                    <div className="text-sm text-muted-foreground">
+                      Distribute to multiple URLs
+                    </div>
+                  </button>
                 </div>
 
-                <Button
-                  variant="outline"
-                  onClick={addPoolEntry}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add URL to Pool
-                </Button>
+                {/* Single Destination */}
+                {!isRandomizer && (
+                  <div className="space-y-2">
+                    <Label htmlFor="destination">Destination URL</Label>
+                    <Input
+                      id="destination"
+                      type="url"
+                      value={destinationUrl}
+                      onChange={(e) => setDestinationUrl(e.target.value)}
+                      placeholder="https://example.com/destination"
+                      className="h-11"
+                    />
+                  </div>
+                )}
 
-                {totalWeight !== 100 && (
-                  <p className="text-sm text-amber-500">
-                    ⚠️ Total weight should equal 100%
-                  </p>
+                {/* Randomizer Pool */}
+                {isRandomizer && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label>URL Pool</Label>
+                      <span className="text-sm text-muted-foreground">
+                        Total weight: {totalWeight}%
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {poolEntries.map((entry, index) => (
+                        <div
+                          key={entry.id}
+                          className="flex gap-2 items-start p-3 bg-muted/30 rounded-lg"
+                        >
+                          <div className="flex-1 space-y-2">
+                            <Input
+                              type="url"
+                              placeholder="https://example.com/option"
+                              value={entry.url}
+                              onChange={(e) =>
+                                updatePoolEntry(entry.id, 'url', e.target.value)
+                              }
+                              className="h-10"
+                            />
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="number"
+                                placeholder="Weight %"
+                                value={entry.weight}
+                                onChange={(e) =>
+                                  updatePoolEntry(entry.id, 'weight', parseInt(e.target.value) || 0)
+                                }
+                                min="0"
+                                max="100"
+                                className="h-10 w-24"
+                              />
+                              <span className="text-sm text-muted-foreground">
+                                % of traffic
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removePoolEntry(entry.id)}
+                            disabled={poolEntries.length <= 2}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      onClick={addPoolEntry}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add URL to Pool
+                    </Button>
+
+                    {totalWeight !== 100 && (
+                      <p className="text-sm text-amber-500">
+                        ⚠️ Total weight should equal 100%
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* UTM Parameters */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold mb-1">UTM Parameters</h2>
-              <p className="text-sm text-muted-foreground">
-                Add tracking parameters to your destination URL for better analytics
-              </p>
-            </div>
+          {/* Campaign Assignment */}
+          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg shadow-lg">
+            <button
+              onClick={() => setIsCampaignOpen(!isCampaignOpen)}
+              className="w-full p-6 flex items-center justify-between hover:bg-muted/10 transition-colors"
+            >
+              <h2 className="text-xl font-semibold">Campaign</h2>
+              {isCampaignOpen ? (
+                <ChevronUp className="w-5 h-5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              )}
+            </button>
             
+            {isCampaignOpen && (
+              <div className="px-6 pb-6">
+            <div className="space-y-2">
+              <Label htmlFor="campaign">Assign to Campaign (Optional)</Label>
+              <select
+                id="campaign"
+                className="w-full h-11 px-3 rounded-md border border-border bg-background"
+              >
+                <option value="">No Campaign</option>
+                <option value="1">Summer Sale</option>
+                <option value="2">Product Launch</option>
+                <option value="3">Spring Campaign</option>
+              </select>
+            </div>
+          </div>
+            )}
+          </div>
+
+          {/* UTM Parameters */}
+          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg shadow-lg">
+            <button
+              onClick={() => setIsUtmOpen(!isUtmOpen)}
+              className="w-full p-6 flex items-center justify-between hover:bg-muted/10 transition-colors"
+            >
+              <div>
+                <h2 className="text-xl font-semibold mb-1 text-left">UTM Parameters (Optional)</h2>
+                <p className="text-sm text-muted-foreground text-left">
+                  Add tracking parameters to your destination URL
+                </p>
+              </div>
+              {isUtmOpen ? (
+                <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />
+              )}
+            </button>
+            
+            {isUtmOpen && (
+              <div className="px-6 pb-6">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="utmSource">Source</Label>
@@ -357,40 +445,35 @@ export function LinkEditPage() {
               )}
             </div>
           </div>
-
-          {/* Campaign Assignment */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Campaign</h2>
-            <div className="space-y-2">
-              <Label htmlFor="campaign">Assign to Campaign (Optional)</Label>
-              <select
-                id="campaign"
-                className="w-full h-11 px-3 rounded-md border border-border bg-background"
-              >
-                <option value="">No Campaign</option>
-                <option value="1">Summer Sale</option>
-                <option value="2">Product Launch</option>
-                <option value="3">Spring Campaign</option>
-              </select>
-            </div>
+            )}
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button onClick={handleSave} size="lg" className="flex-1">
-              <Save className="w-4 h-4 mr-2" />
-              Save Changes
-            </Button>
+          {/* Save Button */}
+          <Button onClick={handleSave} size="lg" className="w-full rounded-full h-12">
+            <Save className="w-4 h-4 mr-2" />
+            Save Changes
+          </Button>
+
+          {/* Danger Zone */}
+          <div className="bg-card/50 backdrop-blur-md border border-destructive/30 rounded-lg p-6 shadow-lg">
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-destructive mb-1">Danger Zone</h2>
+              <p className="text-sm text-muted-foreground">
+                Once you delete a link, there is no going back. Please be certain.
+              </p>
+            </div>
             <Button
               variant="destructive"
               onClick={handleDelete}
               size="lg"
+              className="w-full rounded-full h-12"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete Link
+              Delete Link Permanently
             </Button>
           </div>
         </div>
+      </div>
       </div>
     </AppLayout>
   );

@@ -10,10 +10,16 @@ import { LinkEditPage } from "./pages/link-edit-page";
 import { CampaignsPage } from "./pages/campaigns-page";
 import { CampaignDetailPage } from "./pages/campaign-detail-page";
 import { CampaignFormPage } from "./pages/campaign-form-page";
+import { CampaignAddLinksPage } from "./pages/campaign-add-links-page";
 import { GlobalAnalyticsPage } from "./pages/global-analytics-page";
 import { AnalyticsPage } from "./pages/analytics-page";
 import { TeamPage } from "./pages/team-page";
+import { TeamMemberDetailPage } from "./pages/team-member-detail-page";
+import { WorkspacesPage } from "./pages/workspaces-page";
+import { WorkspaceDetailPage } from "./pages/workspace-detail-page";
 import { SettingsPage } from "./pages/settings-page";
+import { UseCasesPage } from "./pages/use-cases-page";
+import { BookACallPage } from "./pages/book-a-call-page";
 
 function RootLayout() {
   return (
@@ -66,6 +72,10 @@ export const router = createBrowserRouter([
         Component: CampaignDetailPage,
       },
       {
+        path: "/campaigns/:campaignId/add-links",
+        Component: CampaignAddLinksPage,
+      },
+      {
         path: "/campaigns/:campaignId/edit",
         Component: CampaignFormPage,
       },
@@ -82,8 +92,28 @@ export const router = createBrowserRouter([
         Component: TeamPage,
       },
       {
+        path: "/team/:memberId",
+        Component: TeamMemberDetailPage,
+      },
+      {
+        path: "/workspaces",
+        Component: WorkspacesPage,
+      },
+      {
+        path: "/workspaces/:workspaceId",
+        Component: WorkspaceDetailPage,
+      },
+      {
         path: "/settings",
         Component: SettingsPage,
+      },
+      {
+        path: "/use-cases",
+        Component: UseCasesPage,
+      },
+      {
+        path: "/book-a-call",
+        Component: BookACallPage,
       },
     ],
   },

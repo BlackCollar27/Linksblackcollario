@@ -41,7 +41,11 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <Header />
+      <Header customNavItems={[
+        { label: 'Products', href: '#' },
+        { label: 'Use Cases', href: '#' },
+        { label: 'Book a Call', href: '#' },
+      ]} />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-24 sm:py-32">
@@ -56,16 +60,16 @@ export function AuthPage() {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'signin' | 'signup')} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6 h-auto gap-2 p-2 bg-muted/50 dark:bg-muted/20">
+                <TabsTrigger value="signin" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">Sign Up</TabsTrigger>
               </TabsList>
 
               {/* Sign In Form */}
               <TabsContent value="signin" className="space-y-4">
                 <Button 
                   variant="outline" 
-                  className="w-full h-11 sm:h-12 flex items-center justify-center gap-3"
+                  className="w-full h-11 sm:h-12 flex items-center justify-center gap-3 rounded-full"
                   onClick={handleGoogleAuth}
                   type="button"
                 >
@@ -106,7 +110,7 @@ export function AuthPage() {
                       id="signin-email"
                       type="email"
                       placeholder="Enter your email"
-                      className="h-11 sm:h-12"
+                      className="h-11 sm:h-12 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -118,7 +122,7 @@ export function AuthPage() {
                       id="signin-password"
                       type="password"
                       placeholder="Enter your password"
-                      className="h-11 sm:h-12"
+                      className="h-11 sm:h-12 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -129,7 +133,7 @@ export function AuthPage() {
                       Forgot password?
                     </button>
                   </div>
-                  <Button type="submit" className="w-full h-11 sm:h-12" size="lg">
+                  <Button type="submit" className="w-full h-11 sm:h-12 rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90" size="lg">
                     Sign In
                   </Button>
                 </form>
@@ -139,7 +143,7 @@ export function AuthPage() {
               <TabsContent value="signup" className="space-y-4">
                 <Button 
                   variant="outline" 
-                  className="w-full h-11 sm:h-12 flex items-center justify-center gap-3"
+                  className="w-full h-11 sm:h-12 flex items-center justify-center gap-3 rounded-full"
                   onClick={handleGoogleAuth}
                   type="button"
                 >
@@ -180,7 +184,7 @@ export function AuthPage() {
                       id="signup-email"
                       type="email"
                       placeholder="Enter your email"
-                      className="h-11 sm:h-12"
+                      className="h-11 sm:h-12 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -192,7 +196,7 @@ export function AuthPage() {
                       id="signup-password"
                       type="password"
                       placeholder="Create a password"
-                      className="h-11 sm:h-12"
+                      className="h-11 sm:h-12 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -204,13 +208,13 @@ export function AuthPage() {
                       id="signup-confirm-password"
                       type="password"
                       placeholder="Confirm your password"
-                      className="h-11 sm:h-12"
+                      className="h-11 sm:h-12 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full h-11 sm:h-12" size="lg">
+                  <Button type="submit" className="w-full h-11 sm:h-12 rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90" size="lg">
                     Create Account
                   </Button>
                 </form>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { AppLayout } from '../components/app-layout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -13,6 +14,7 @@ interface TeamMember {
 }
 
 export function TeamPage() {
+  const navigate = useNavigate();
   const [inviteEmail, setInviteEmail] = useState('');
   
   // Mock data - replace with API call to Rails backend
@@ -61,20 +63,23 @@ export function TeamPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="min-h-screen bg-background relative">
+        {/* Subtle background pattern for glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        
+        <div className="max-w-4xl mx-auto px-4 py-6 relative">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold mb-2">Team</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="mb-2 text-center text-[36px]">Team</h1>
+            <p className="text-sm text-muted-foreground text-center">
               Manage your team members and their permissions
             </p>
           </div>
 
           {/* Invite Section */}
-          <div className="bg-card border border-border rounded-lg p-5 mb-6">
-            <h2 className="text-lg font-semibold mb-4">Invite Team Member</h2>
-            <form onSubmit={handleInvite} className="flex gap-3">
+          <div className="bg-card/50 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-5 mb-6">
+            <h2 className="mb-4 text-center font-light text-[20px]">Invite Team Member</h2>
+            <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <Input
                   type="email"
@@ -82,42 +87,25 @@ export function TeamPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   required
-                  className="h-10"
+                  className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                 />
               </div>
-              <Button type="submit" className="h-10">
+              <Button type="submit" className="h-10 rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90">
                 <Mail className="w-4 h-4 mr-2" />
                 Send Invite
               </Button>
             </form>
           </div>
 
-          {/* Team Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-xs text-muted-foreground mb-1">Total Members</p>
-              <p className="text-3xl font-bold">{members.length}</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-xs text-muted-foreground mb-1">Admins</p>
-              <p className="text-3xl font-bold">
-                {members.filter(m => m.role === 'admin').length}
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-xs text-muted-foreground mb-1">Active</p>
-              <p className="text-3xl font-bold">{members.length}</p>
-            </div>
-          </div>
-
           {/* Team Members List */}
-          <div>
-            <h2 className="text-xl font-bold mb-4">Team Members</h2>
+          <div className="mb-6">
+            <h2 className="text-xl mb-4 text-center">Team Members</h2>
             <div className="space-y-3">
               {members.map((member) => (
                 <div
                   key={member.id}
-                  className="bg-card border border-border rounded-lg p-4"
+                  onClick={() => navigate(`/team/${member.id}`)}
+                  className="bg-card/50 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-4 cursor-pointer hover:bg-card/70 transition-all"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -142,20 +130,24 @@ export function TeamPage() {
                       >
                         {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                       </span>
-                      
-                      {member.role !== 'owner' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
                     </div>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Team Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-card/50 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-4">
+              <p className="text-xs text-muted-foreground mb-1 text-center">Total Members</p>
+              <p className="text-3xl text-center">{members.length}</p>
+            </div>
+            <div className="bg-card/50 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-4">
+              <p className="text-xs text-muted-foreground mb-1 text-center">Admins</p>
+              <p className="text-3xl text-center">
+                {members.filter(m => m.role === 'admin').length}
+              </p>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: { email: string; name: string } | null;
+  user: { email: string; name: string; role: 'owner' | 'admin' | 'member' } | null;
   login: (email: string, password: string) => void;
   logout: () => void;
   signup: (email: string, password: string) => void;
@@ -13,23 +13,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Default to authenticated for development - set to true to access all pages
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [user, setUser] = useState<{ email: string; name: string } | null>({
+  const [user, setUser] = useState<{ email: string; name: string; role: 'owner' | 'admin' | 'member' } | null>({
     email: 'dev@example.com',
-    name: 'Developer'
+    name: 'Developer',
+    role: 'admin' // Change to 'owner', 'admin', or 'member' to test different permission levels
   });
 
   const login = (email: string, password: string) => {
     // TODO: Replace with actual API call to your Rails backend
     console.log('Login:', email, password);
     setIsAuthenticated(true);
-    setUser({ email, name: email.split('@')[0] });
+    setUser({ email, name: email.split('@')[0], role: 'admin' });
   };
 
   const signup = (email: string, password: string) => {
     // TODO: Replace with actual API call to your Rails backend
     console.log('Signup:', email, password);
     setIsAuthenticated(true);
-    setUser({ email, name: email.split('@')[0] });
+    setUser({ email, name: email.split('@')[0], role: 'member' });
   };
 
   const logout = () => {

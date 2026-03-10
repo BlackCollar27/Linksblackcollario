@@ -38,17 +38,18 @@ export function CampaignsPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background">
-        <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="min-h-screen bg-background relative mx-[0px] mt-[20px] mb-[0px]">
+        {/* Subtle background pattern for glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        
+        <div className="max-w-5xl mx-auto px-4 py-6 relative">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Campaigns</h1>
-              <p className="text-sm text-muted-foreground">
-                Organize and track your link campaigns
-              </p>
-            </div>
-            <Button onClick={() => navigate('/campaigns/new')} className="h-10">
+          <div className="mb-6">
+            <h1 className="mb-2 text-center text-[32px]">Campaigns</h1>
+            <p className="text-sm text-muted-foreground mb-4 text-center">
+              Organize and track your link campaigns
+            </p>
+            <Button onClick={() => navigate('/campaigns/new')} className="h-10 mx-auto flex items-center rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90">
               <Plus className="w-4 h-4 mr-2" />
               New Campaign
             </Button>
@@ -56,7 +57,7 @@ export function CampaignsPage() {
 
           {/* Campaigns Grid */}
           {campaigns.length === 0 ? (
-            <div className="text-center py-12 bg-card border border-border rounded-lg">
+            <div className="text-center py-12 bg-card rounded-lg">
               <FolderKanban className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-lg font-semibold mb-2">No campaigns yet</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -72,16 +73,14 @@ export function CampaignsPage() {
               {campaigns.map((campaign) => (
                 <div
                   key={campaign.id}
-                  className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-colors cursor-pointer"
+                  className="bg-card/50 backdrop-blur-md rounded-lg p-5 shadow-lg hover:shadow-xl transition-all cursor-pointer bg-[#ffffff]"
                   onClick={() => navigate(`/campaigns/${campaign.id}`)}
                 >
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <FolderKanban className="w-5 h-5 text-primary" />
-                    </div>
+                    
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold mb-1 truncate">{campaign.name}</h3>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
+                      <h3 className="font-light mb-1 truncate text-center text-[20px]">{campaign.name}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 text-center">
                         {campaign.description}
                       </p>
                     </div>
@@ -101,13 +100,12 @@ export function CampaignsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full mt-3 h-8 text-xs"
+                    className="w-full mt-3 h-8 text-xs bg-black dark:bg-white text-white dark:text-black border-black dark:border-white hover:bg-black/90 dark:hover:bg-white/90 rounded-full"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/campaigns/${campaign.id}`);
                     }}
                   >
-                    <BarChart3 className="w-3 h-3 mr-1" />
                     View Details
                   </Button>
                 </div>

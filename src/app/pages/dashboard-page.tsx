@@ -3,17 +3,22 @@ import { useNavigate } from 'react-router';
 import { AppLayout } from '../components/app-layout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { 
   Link as LinkIcon, 
   Copy, 
   BarChart3, 
   TrendingUp,
   Folder,
-  Target
+  Target,
+  Edit,
+  Plus,
+  X
 } from 'lucide-react';
 
 interface ShortenedLink {
   id: string;
+  name: string;
   originalUrl: string;
   shortCode: string;
   shortUrl: string;
@@ -27,6 +32,15 @@ export function DashboardPage() {
   const [customSlug, setCustomSlug] = useState('');
   const [showCustomSlug, setShowCustomSlug] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState('');
+  const [linkScrollPosition, setLinkScrollPosition] = useState(0);
+  const [campaignScrollPosition, setCampaignScrollPosition] = useState(0);
+
+  // Single link state
+  const [linkName, setLinkName] = useState('');
+
+  // Randomizer state
+  const [randomizerUrls, setRandomizerUrls] = useState<string[]>(['', '']);
+  const [randomizerName, setRandomizerName] = useState('');
 
   // UTM Parameters state
   const [utmSource, setUtmSource] = useState('');
@@ -35,21 +49,32 @@ export function DashboardPage() {
   const [utmTerm, setUtmTerm] = useState('');
   const [utmContent, setUtmContent] = useState('');
 
+  // Domain selection state
+  const [selectedDomain, setSelectedDomain] = useState('links.blackcollar.io');
+  
+  // Available domains (would come from API/settings in production)
+  const availableDomains = [
+    { id: '1', domain: 'links.blackcollar.io', isDefault: true, status: 'verified' },
+    { id: '2', domain: 'mybrand.com', isDefault: false, status: 'verified' },
+  ];
+
   // Mock data - replace with API call to Rails backend
   const [links, setLinks] = useState<ShortenedLink[]>([
     {
       id: '1',
+      name: 'Table 3',
       originalUrl: 'https://www.example.com/very-long-url-that-needs-shortening',
       shortCode: 'abc123',
-      shortUrl: 'blackcollar.io/abc123',
+      shortUrl: 'links.blackcollar.io/abc123',
       clicks: 1247,
       createdAt: '2026-02-15',
     },
     {
       id: '2',
+      name: 'Table 5',
       originalUrl: 'https://www.example.com/another-long-url',
       shortCode: 'xyz789',
-      shortUrl: 'blackcollar.io/xyz789',
+      shortUrl: 'links.blackcollar.io/xyz789',
       clicks: 543,
       createdAt: '2026-02-20',
     },
@@ -60,10 +85,11 @@ export function DashboardPage() {
     
     // TODO: Replace with actual API call to Rails backend
     const slug = customSlug || Math.random().toString(36).substring(2, 8);
-    const newShortUrl = `blackcollar.io/${slug}`;
+    const newShortUrl = `${selectedDomain}/${slug}`;
     
     const newLink: ShortenedLink = {
       id: String(Date.now()),
+      name: linkName || 'New Link',
       originalUrl: longUrl,
       shortCode: slug,
       shortUrl: newShortUrl,
@@ -73,6 +99,51 @@ export function DashboardPage() {
     
     setLinks([newLink, ...links]);
     setGeneratedUrl(newShortUrl);
+  };
+
+  const handleCreateRandomizer = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Filter out empty URLs
+    const validUrls = randomizerUrls.filter(url => url.trim() !== '');
+    
+    if (validUrls.length < 2) {
+      alert('Please add at least 2 destination URLs for the randomizer');
+      return;
+    }
+    
+    // TODO: Replace with actual API call to Rails backend
+    const slug = customSlug || Math.random().toString(36).substring(2, 8);
+    const newShortUrl = `${selectedDomain}/${slug}`;
+    
+    const newLink: ShortenedLink = {
+      id: String(Date.now()),
+      name: randomizerName || 'Randomizer Link',
+      originalUrl: `${validUrls.length} destinations`,
+      shortCode: slug,
+      shortUrl: newShortUrl,
+      clicks: 0,
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    
+    setLinks([newLink, ...links]);
+    setGeneratedUrl(newShortUrl);
+  };
+
+  const addRandomizerUrl = () => {
+    setRandomizerUrls([...randomizerUrls, '']);
+  };
+
+  const removeRandomizerUrl = (index: number) => {
+    if (randomizerUrls.length > 2) {
+      setRandomizerUrls(randomizerUrls.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateRandomizerUrl = (index: number, value: string) => {
+    const newUrls = [...randomizerUrls];
+    newUrls[index] = value;
+    setRandomizerUrls(newUrls);
   };
 
   const copyToClipboard = (text: string) => {
@@ -112,115 +183,294 @@ export function DashboardPage() {
   const totalCampaigns = campaigns.length;
   const totalCampaignClicks = campaigns.reduce((sum, campaign) => sum + campaign.clicks, 0);
 
+  // Scroll handlers for links
+  const scrollLinks = (direction: 'left' | 'right') => {
+    const newIndex = direction === 'left' 
+      ? Math.max(0, linkScrollPosition - 1)
+      : Math.min(links.length - 1, linkScrollPosition + 1);
+    setLinkScrollPosition(newIndex);
+  };
+
+  // Scroll handlers for campaigns
+  const scrollCampaigns = (direction: 'left' | 'right') => {
+    const newIndex = direction === 'left' 
+      ? Math.max(0, campaignScrollPosition - 1)
+      : Math.min(campaigns.length - 1, campaignScrollPosition + 1);
+    setCampaignScrollPosition(newIndex);
+  };
+
   return (
     <AppLayout>
-      <div className="w-full overflow-x-hidden">
-        <div className="max-w-2xl mx-auto px-4 py-6 w-full">
+      <div className="w-full overflow-x-hidden min-h-screen bg-background relative">
+        {/* Subtle background pattern for glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        
+        {/* Shorten Links Section - Narrow Container */}
+        <div className="max-w-2xl mx-auto px-4 py-6 w-full mt-[20px] mb-[0px] relative">
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-center">
-            Shorten your links
+          <h1 className="mb-2 text-center text-[32px]">
+            <span>Make </span>
+            <span className="text-primary">Every NFC Tap</span>
+            <span> Measurable</span>
           </h1>
-          <p className="text-sm text-muted-foreground mb-6 text-center">
-            Create short, branded links that are easy to share and track performance
+          <p className="text-sm text-muted-foreground/70 dark:text-muted-foreground mb-6 text-center">
+            The link management platform built for NFC-powered products & campaigns
           </p>
 
           {/* Link Shortener Form */}
-          <div className="bg-card border border-border rounded-lg p-4 mb-6 w-full">
-            <form onSubmit={handleCreateLink} className="space-y-3">
-              <div>
-                <label htmlFor="long-url" className="block text-xs font-medium mb-1.5 text-foreground text-center">
-                  Paste your long link here
-                </label>
-                <Input
-                  id="long-url"
-                  type="url"
-                  placeholder="https://example.com/your-long-url"
-                  value={longUrl}
-                  onChange={(e) => setLongUrl(e.target.value)}
-                  required
-                  className="h-10 text-sm bg-background w-full"
-                />
-              </div>
+          <div className="bg-card/50 backdrop-blur-md rounded-lg p-4 mb-6 w-full bg-[#0a0a0a00]">
+            <Tabs defaultValue="single" className="w-full">
+              <TabsList className="w-full mb-4 grid grid-cols-2 h-auto gap-2 p-2 bg-muted/50 dark:bg-muted/20">
+                <TabsTrigger value="single" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">
+                  Single Link
+                </TabsTrigger>
+                <TabsTrigger value="randomizer" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">
+                  Randomizer
+                </TabsTrigger>
+              </TabsList>
 
-              {showCustomSlug && (
-                <div className="space-y-3">
+              {/* Single Link Tab */}
+              <TabsContent value="single">
+                <form onSubmit={handleCreateLink} className="space-y-3">
                   <div>
-                    <label htmlFor="custom-slug" className="block text-xs font-medium mb-1.5">
-                      Customize your link (optional)
+                    <label htmlFor="long-url" className="block font-medium mb-1.5 text-[15px] text-center">
+                      Destination URL
                     </label>
-                    <div className="flex items-center gap-2 w-full">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">blackcollar.io/</span>
-                      <Input
-                        id="custom-slug"
-                        type="text"
-                        placeholder="my-link"
-                        value={customSlug}
-                        onChange={(e) => setCustomSlug(e.target.value)}
-                        className="h-10 text-sm flex-1 min-w-0"
-                      />
-                    </div>
+                    <Input
+                      id="long-url"
+                      type="url"
+                      placeholder="https://example.com/your-long-url"
+                      value={longUrl}
+                      onChange={(e) => setLongUrl(e.target.value)}
+                      required
+                      className="h-10 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                    />
                   </div>
 
-                  {/* UTM Parameters */}
-                  <div className="pt-3 border-t border-border">
-                    <p className="text-xs font-medium mb-2">UTM Parameters (optional)</p>
-                    <div className="space-y-2">
-                      <Input
-                        type="text"
-                        placeholder="Source (e.g., facebook, newsletter)"
-                        value={utmSource}
-                        onChange={(e) => setUtmSource(e.target.value)}
-                        className="h-9 text-xs"
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Medium (e.g., social, email)"
-                        value={utmMedium}
-                        onChange={(e) => setUtmMedium(e.target.value)}
-                        className="h-9 text-xs"
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Campaign (e.g., spring_sale)"
-                        value={utmCampaign}
-                        onChange={(e) => setUtmCampaign(e.target.value)}
-                        className="h-9 text-xs"
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Term (optional)"
-                        value={utmTerm}
-                        onChange={(e) => setUtmTerm(e.target.value)}
-                        className="h-9 text-xs"
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Content (optional)"
-                        value={utmContent}
-                        onChange={(e) => setUtmContent(e.target.value)}
-                        className="h-9 text-xs"
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="link-name" className="block font-medium mb-1.5 text-[15px] text-center">
+                      Link Name (optional)
+                    </label>
+                    <Input
+                      id="link-name"
+                      type="text"
+                      placeholder="My Link"
+                      value={linkName}
+                      onChange={(e) => setLinkName(e.target.value)}
+                      className="h-10 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                    />
                   </div>
-                </div>
-              )}
 
-              <Button 
-                type="submit" 
-                className="w-full h-10 text-sm"
-              >
-                <LinkIcon className="w-4 h-4 mr-2" />
-                Shorten Link
-              </Button>
+                  {showCustomSlug && (
+                    <div className="space-y-3">
+                      {/* Domain Selector */}
+                      <div>
+                        <label htmlFor="domain-select" className="block text-xs font-medium mb-1.5">
+                          Select Domain
+                        </label>
+                        <select
+                          id="domain-select"
+                          value={selectedDomain}
+                          onChange={(e) => setSelectedDomain(e.target.value)}
+                          className="h-10 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none px-4"
+                        >
+                          {availableDomains.map((domain) => (
+                            <option key={domain.id} value={domain.domain}>
+                              {domain.domain} {domain.isDefault ? '(Default)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-              <button
-                type="button"
-                onClick={() => setShowCustomSlug(!showCustomSlug)}
-                className="w-full py-2.5 text-xs text-center bg-card border border-border rounded-md hover:bg-muted/30 transition-colors"
-              >
-                {showCustomSlug ? 'Hide customization' : 'Customize'}
-              </button>
-            </form>
+                      <div>
+                        <label htmlFor="custom-slug" className="block text-xs font-medium mb-1.5">
+                          Customize your link (optional)
+                        </label>
+                        <div className="flex items-center gap-2 w-full">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{selectedDomain}/</span>
+                          <Input
+                            id="custom-slug"
+                            type="text"
+                            placeholder="my-link"
+                            value={customSlug}
+                            onChange={(e) => setCustomSlug(e.target.value)}
+                            className="h-10 text-sm flex-1 min-w-0 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* UTM Parameters */}
+                      <div className="pt-3">
+                        <p className="text-xs font-medium mb-2">UTM Parameters (optional)</p>
+                        <div className="space-y-2">
+                          <Input
+                            type="text"
+                            placeholder="Source (e.g., facebook, newsletter)"
+                            value={utmSource}
+                            onChange={(e) => setUtmSource(e.target.value)}
+                            className="h-9 text-xs rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Medium (e.g., social, email)"
+                            value={utmMedium}
+                            onChange={(e) => setUtmMedium(e.target.value)}
+                            className="h-9 text-xs rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Campaign (e.g., spring_sale)"
+                            value={utmCampaign}
+                            onChange={(e) => setUtmCampaign(e.target.value)}
+                            className="h-9 text-xs rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Term (optional)"
+                            value={utmTerm}
+                            onChange={(e) => setUtmTerm(e.target.value)}
+                            className="h-9 text-xs rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Content (optional)"
+                            value={utmContent}
+                            onChange={(e) => setUtmContent(e.target.value)}
+                            className="h-9 text-xs rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <Button 
+                    type="submit" 
+                    className="w-full h-10 text-sm rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
+                  >
+                    <LinkIcon className="w-4 h-4 mr-2" />
+                    Shorten Link
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomSlug(!showCustomSlug)}
+                    className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
+                  >
+                    {showCustomSlug ? 'Hide customization' : 'Customize'}
+                  </button>
+                </form>
+              </TabsContent>
+
+              {/* Randomizer Tab */}
+              <TabsContent value="randomizer">
+                <form onSubmit={handleCreateRandomizer} className="space-y-3">
+                  <div>
+                    <label htmlFor="randomizer-name" className="block font-medium mb-1.5 text-[15px] text-center">
+                      Randomizer Name
+                    </label>
+                    <Input
+                      id="randomizer-name"
+                      type="text"
+                      placeholder="My Randomizer Link"
+                      value={randomizerName}
+                      onChange={(e) => setRandomizerName(e.target.value)}
+                      className="h-10 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block font-medium mb-1.5 text-[15px] text-center">
+                      Destination URLs (minimum 2)
+                    </label>
+                    {randomizerUrls.map((url, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          type="url"
+                          placeholder={`https://example.com/destination-${index + 1}`}
+                          value={url}
+                          onChange={(e) => updateRandomizerUrl(index, e.target.value)}
+                          required
+                          className="h-10 text-sm flex-1 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                        />
+                        {randomizerUrls.length > 2 && (
+                          <button
+                            type="button"
+                            onClick={() => removeRandomizerUrl(index)}
+                            className="p-2 hover:bg-muted rounded-full transition-colors shrink-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addRandomizerUrl}
+                      className="w-full rounded-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add URL
+                    </Button>
+                  </div>
+
+                  {showCustomSlug && (
+                    <div>
+                      {/* Domain Selector */}
+                      <div className="mb-3">
+                        <label htmlFor="domain-select-randomizer" className="block text-xs font-medium mb-1.5">
+                          Select Domain
+                        </label>
+                        <select
+                          id="domain-select-randomizer"
+                          value={selectedDomain}
+                          onChange={(e) => setSelectedDomain(e.target.value)}
+                          className="h-10 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none px-4"
+                        >
+                          {availableDomains.map((domain) => (
+                            <option key={domain.id} value={domain.domain}>
+                              {domain.domain} {domain.isDefault ? '(Default)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <label htmlFor="custom-slug-randomizer" className="block text-xs font-medium mb-1.5">
+                        Customize your link (optional)
+                      </label>
+                      <div className="flex items-center gap-2 w-full">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{selectedDomain}/</span>
+                        <Input
+                          id="custom-slug-randomizer"
+                          type="text"
+                          placeholder="my-randomizer"
+                          value={customSlug}
+                          onChange={(e) => setCustomSlug(e.target.value)}
+                          className="h-10 text-sm flex-1 min-w-0 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button 
+                    type="submit" 
+                    className="w-full h-10 text-sm rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
+                  >
+                    <Target className="w-4 h-4 mr-2" />
+                    Create Randomizer
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomSlug(!showCustomSlug)}
+                    className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
+                  >
+                    {showCustomSlug ? 'Hide customization' : 'Customize'}
+                  </button>
+                </form>
+              </TabsContent>
+            </Tabs>
 
             {generatedUrl && (
               <div className="mt-3 p-3 bg-muted/30 rounded-md border border-border w-full">
@@ -241,158 +491,107 @@ export function DashboardPage() {
               </div>
             )}
           </div>
+        </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 w-full">
-            <div className="bg-card border border-border rounded-lg p-3 sm:p-4 min-w-0">
-              <p className="text-xs text-muted-foreground mb-1">Total Links</p>
-              <p className="text-3xl sm:text-4xl font-bold mb-0.5">{totalLinks}</p>
-              <p className="text-xs text-muted-foreground">1/100 used</p>
-            </div>
+        {/* Recent Links and Campaigns Section - Full Width Container */}
+        <div className="w-full px-4 py-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="space-y-12 w-full">
+              {/* Recent Links */}
+              <div className="w-full">
+                <div className="flex flex-col items-center mb-6 gap-2">
+                  <h2 className="text-center text-[32px]">Recent Links</h2>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => navigate('/links')}
+                    className="text-xs px-4 py-2 rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
+                  >
+                    View All
+                  </Button>
+                </div>
 
-            <div className="bg-card border border-border rounded-lg p-3 sm:p-4 min-w-0">
-              <p className="text-xs text-muted-foreground mb-1">Total Clicks</p>
-              <p className="text-3xl sm:text-4xl font-bold mb-0.5">{totalClicks.toLocaleString()}</p>
-              <p className="text-xs text-green-500 flex items-center">
-                <TrendingUp className="w-3 h-3 mr-1 shrink-0" />
-                +12% this week
-              </p>
-            </div>
-          </div>
+                {/* Grid Layout for Desktop, Stack for Mobile */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {links.slice(0, 2).map((link) => (
+                    <div
+                      key={link.id}
+                      onClick={() => navigate(`/links/${link.id}`)}
+                      className="bg-card/50 backdrop-blur-md rounded-lg p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-shadow"
+                    >
+                      {/* Link Name at top */}
+                      <h3 className="font-semibold mb-2 text-center text-[20px]">{link.name}</h3>
 
-          {/* Recent Links */}
-          <div className="mb-6 w-full">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-bold">Recent Links</h2>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/links')}
-                className="text-primary text-xs h-auto p-0 hover:bg-transparent shrink-0"
-              >
-                View All
-              </Button>
-            </div>
-
-            <div className="space-y-3 w-full">
-              {links.slice(0, 5).map((link) => (
-                <div
-                  key={link.id}
-                  className="bg-card border border-border rounded-lg p-3 w-full min-w-0"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-2 w-full min-w-0">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-0.5 min-w-0">
-                        <span className="font-medium text-sm truncate">
+                      {/* Short URL with copy button */}
+                      <div className="flex items-center justify-center gap-1.5 mb-1 min-w-0">
+                        <span className="font-medium text-sm truncate text-primary">
                           {link.shortUrl}
                         </span>
                         <button
-                          onClick={() => copyToClipboard(link.shortUrl)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(link.shortUrl);
+                          }}
                           className="p-1 hover:bg-muted rounded shrink-0"
                         >
                           <Copy className="w-3 h-3" />
                         </button>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
+
+                      {/* Original URL */}
+                      <p className="text-xs text-muted-foreground truncate mb-3 text-center">
                         {link.originalUrl}
                       </p>
-                    </div>
-                    <div className="text-right shrink-0 ml-2">
-                      <p className="text-xl font-bold leading-none">{link.clicks.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">clicks</p>
-                    </div>
-                  </div>
 
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 h-8 text-xs min-w-0"
-                      onClick={() => navigate(`/links/${link.id}`)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 h-8 text-xs min-w-0"
-                      onClick={() => navigate(`/analytics/${link.id}`)}
-                    >
-                      <BarChart3 className="w-3 h-3 mr-1 shrink-0" />
-                      Stats
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Campaign Stats */}
-          <div className="mb-6 w-full">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-bold">Campaign Overview</h2>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/campaigns')}
-                className="text-primary text-xs h-auto p-0 hover:bg-transparent shrink-0"
-              >
-                View All
-              </Button>
-            </div>
-
-            {/* Campaign Summary Cards */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 w-full">
-              <div className="bg-card border border-border rounded-lg p-3 sm:p-4 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <Folder className="w-4 h-4 text-primary" />
-                  <p className="text-xs text-muted-foreground">Active Campaigns</p>
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold">{totalCampaigns}</p>
-              </div>
-
-              <div className="bg-card border border-border rounded-lg p-3 sm:p-4 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="w-4 h-4 text-primary" />
-                  <p className="text-xs text-muted-foreground">Campaign Clicks</p>
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold">{totalCampaignClicks.toLocaleString()}</p>
-              </div>
-            </div>
-
-            {/* Top Campaigns List */}
-            <div className="space-y-3 w-full">
-              {campaigns.slice(0, 3).map((campaign) => (
-                <div
-                  key={campaign.id}
-                  onClick={() => navigate(`/campaigns/${campaign.id}`)}
-                  className="bg-card border border-border rounded-lg p-3 w-full min-w-0 cursor-pointer hover:bg-muted/30 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-2 w-full min-w-0">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Folder className="w-4 h-4 text-primary shrink-0" />
-                        <span className="font-medium text-sm truncate">
-                          {campaign.name}
-                        </span>
+                      {/* Clicks - own row */}
+                      <div className="bg-muted/30 rounded p-2 text-center">
+                        <p className="text-2xl leading-none mb-1">{link.clicks.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">clicks</p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Campaign Stats */}
+              <div className="w-full">
+                <div className="flex flex-col items-center mb-6 gap-2">
+                  <h2 className="text-center text-[32px]">Recent Campaigns</h2>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => navigate('/campaigns')}
+                    className="text-xs px-4 py-2 rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
+                  >
+                    View All
+                  </Button>
+                </div>
+
+                {/* Grid Layout for Desktop, Stack for Mobile */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {campaigns.slice(0, 3).map((campaign) => (
+                    <div
+                      key={campaign.id}
+                      onClick={() => navigate(`/campaigns/${campaign.id}`)}
+                      className="bg-card/50 backdrop-blur-md rounded-lg p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-shadow"
+                    >
+                      {/* Campaign Name at top */}
+                      <h3 className="font-semibold mb-2 text-center text-[20px]">{campaign.name}</h3>
+
+                      {/* Description */}
+                      <p className="text-xs text-muted-foreground mb-3 text-center">
                         {campaign.description}
                       </p>
-                    </div>
-                    <div className="text-right shrink-0 ml-2">
-                      <p className="text-xl font-bold leading-none">{campaign.clicks.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">clicks</p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{campaign.linksCount} links</span>
-                    <span>•</span>
-                    <span>{Math.round(campaign.clicks / campaign.linksCount)} avg. clicks/link</span>
-                  </div>
+                      {/* Clicks - own row */}
+                      <div className="bg-muted/30 rounded p-2 text-center">
+                        <p className="text-2xl leading-none mb-1">{campaign.clicks.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">clicks</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>

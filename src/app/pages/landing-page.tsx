@@ -1,88 +1,72 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Header } from '../components/header';
 import { Footer } from '../components/footer';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Link } from 'react-router';
-import { Link2, BarChart3, Zap, Shield, Copy, Target, Plus, X } from 'lucide-react';
+import { BarChart3, Zap, Shield, Copy, Link2, ArrowRight, ExternalLink, ArrowLeft } from 'lucide-react';
 
 export function LandingPage() {
-  const [longUrl, setLongUrl] = useState('');
-  const [linkName, setLinkName] = useState('');
-  const [customSlug, setCustomSlug] = useState('');
-  const [showCustomize, setShowCustomize] = useState(false);
-  const [shortUrl, setShortUrl] = useState('');
-  
-  // Randomizer state
-  const [randomizerUrls, setRandomizerUrls] = useState<string[]>(['', '']);
-  const [randomizerName, setRandomizerName] = useState('');
+  // Multi-step form state
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    url: '',
+    name: '',
+    userName: '',
+    email: ''
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
 
-  // Rotating headline state
-  const phrases = ['Word of Mouth', 'Every Touchpoint', 'Every NFC Tap'];
-  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(2);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Rotating headline effect
-  useEffect(() => {
-    if (isPaused) return;
-
-    intervalRef.current = setInterval(() => {
-      setIsAnimating(true);
-      
-      setTimeout(() => {
-        setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
-        setIsAnimating(false);
-      }, 400);
-    }, 5000);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPaused, phrases.length]);
-
-  const handleShorten = (e: React.FormEvent) => {
+  const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock shortening - replace with API call
-    const slug = customSlug || Math.random().toString(36).substring(2, 8);
-    setShortUrl(`blackcollar.io/${slug}`);
-  };
-
-  const handleCreateRandomizer = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Filter out empty URLs
-    const validUrls = randomizerUrls.filter(url => url.trim() !== '');
-    
-    if (validUrls.length < 2) {
-      alert('Please add at least 2 destination URLs for the randomizer');
-      return;
-    }
-    
-    const slug = customSlug || Math.random().toString(36).substring(2, 8);
-    setShortUrl(`blackcollar.io/${slug}`);
-  };
-
-  const addRandomizerUrl = () => {
-    setRandomizerUrls([...randomizerUrls, '']);
-  };
-
-  const removeRandomizerUrl = (index: number) => {
-    if (randomizerUrls.length > 2) {
-      setRandomizerUrls(randomizerUrls.filter((_, i) => i !== index));
+    if (formData.url) {
+      setCurrentStep(2);
     }
   };
 
-  const updateRandomizerUrl = (index: number, value: string) => {
-    const newUrls = [...randomizerUrls];
-    newUrls[index] = value;
-    setRandomizerUrls(newUrls);
+  const handleStep2Submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentStep(3);
+  };
+
+  const handleSkipStep2 = () => {
+    setCurrentStep(3);
+  };
+
+  const handleBackStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const handleFinalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Generate a random short link
+    const slug = Math.random().toString(36).substring(2, 8);
+    setGeneratedLink(`links.blackcollar.io/${slug}`);
+    setIsSubmitted(true);
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(shortUrl);
-    alert('Copied to clipboard!');
+    // Fallback method for copying to clipboard that works in all browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = generatedLink;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    } finally {
+      textArea.remove();
+    }
   };
 
   return (
@@ -90,287 +74,278 @@ export function LandingPage() {
       <Header customNavItems={[
         { label: 'Products', href: 'https://www.blackcollar.io' },
         { label: 'Use Cases', href: '/use-cases' },
+        { label: 'Pricing', href: '/pricing' },
         { label: 'Book a Call', href: '/book-a-call' },
       ]} />
 
-      {/* Hero Section with Link Shortener */}
+      {/* Hero Section with Multi-Step Form */}
       <main className="flex-1 pt-20 relative">
         {/* Gradient background matching dashboard */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
         
         <section className="px-[16px] py-[120px] relative">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl mb-4 text-center">
-              <span>Make </span>
-              <span className="text-primary">Every NFC Tap</span>
-              <span> Measurable</span>
-            </h1>
-            <p className="text-base sm:text-lg text-muted-foreground mb-8 text-center max-w-2xl mx-auto">The link management platform built for NFC-powered products & campaigns</p>
+            {!isSubmitted ? (
+              <>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl mb-4 text-center">
+                  Create a Modern Experience in Seconds
+                </h1>
+                <p className="text-base sm:text-lg text-muted-foreground mb-8 text-center max-w-2xl mx-auto">Activate your free NFC experience and start tracking.</p>
 
-            {/* Link Shortener Card */}
-            <div className="backdrop-blur-md rounded-lg p-6 sm:p-8 mb-8">
-              <Tabs defaultValue="single" className="w-full">
-                <TabsList className="w-full mb-6 grid grid-cols-2 h-auto gap-2 p-2 bg-muted/50 dark:bg-muted/20">
-                  <TabsTrigger value="single" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">
-                    Single Link
-                  </TabsTrigger>
-                  <TabsTrigger value="randomizer" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">
-                    Randomizer
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Single Link Tab */}
-                <TabsContent value="single">
-                  <form onSubmit={handleShorten} className="space-y-4">
-                    <div>
-                      <label htmlFor="long-url" className="block font-medium mb-2 text-[15px]">
-                        Destination URL
-                      </label>
-                      <Input
-                        id="long-url"
-                        type="url"
-                        placeholder="https://example.com/your-long-url"
-                        value={longUrl}
-                        onChange={(e) => setLongUrl(e.target.value)}
-                        required
-                        className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="link-name" className="block font-medium mb-2 text-[15px]">
-                        Link Name (optional)
-                      </label>
-                      <Input
-                        id="link-name"
-                        type="text"
-                        placeholder="My Link"
-                        value={linkName}
-                        onChange={(e) => setLinkName(e.target.value)}
-                        className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
-                      />
-                    </div>
-
-                    {showCustomize && (
-                      <div>
-                        <label htmlFor="custom-slug" className="block text-sm font-medium mb-2">
-                          Customize your link (optional)
-                        </label>
-                        <div className="flex items-center gap-2 w-full">
-                          <span className="text-sm text-muted-foreground whitespace-nowrap shrink-0">blackcollar.io/</span>
-                          <Input
-                            id="custom-slug"
-                            type="text"
-                            placeholder="my-custom-link"
-                            value={customSlug}
-                            onChange={(e) => setCustomSlug(e.target.value)}
-                            className="h-12 text-sm flex-1 min-w-0 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
-                          />
-                        </div>
+                {/* Multi-Step Form Card */}
+                <div className="p-6 sm:p-8 mb-8">
+                  {/* Step 1: Your Link */}
+                  {currentStep === 1 && (
+                    <form onSubmit={handleStep1Submit} className="space-y-4">
+                      <div className="text-center mb-4">
+                        
                       </div>
-                    )}
+                      
+                      <div>
+                        <label htmlFor="url" className="block font-medium mb-2 text-[15px] text-center">Enter Your URL                        </label>
+                        <Input
+                          id="url"
+                          type="url"
+                          placeholder="https://example.com"
+                          value={formData.url}
+                          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                          required
+                          className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                        />
+                      </div>
 
-                    <Button 
-                      type="submit" 
-                      className="w-full h-12 text-sm rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
-                    >
-                      <Link2 className="w-5 h-5 mr-2" />
-                      Shorten Link
-                    </Button>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowCustomize(!showCustomize)}
-                      className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
-                    >
-                      {showCustomize ? 'Hide customization' : 'Customize'}
-                    </button>
-                  </form>
-                </TabsContent>
-
-                {/* Randomizer Tab */}
-                <TabsContent value="randomizer">
-                  <form onSubmit={handleCreateRandomizer} className="space-y-4">
-                    <div>
-                      <label htmlFor="randomizer-name" className="block font-medium mb-2 text-[15px]">
-                        Randomizer Name
-                      </label>
-                      <Input
-                        id="randomizer-name"
-                        type="text"
-                        placeholder="My Randomizer Link"
-                        value={randomizerName}
-                        onChange={(e) => setRandomizerName(e.target.value)}
-                        className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block font-medium mb-2 text-[15px]">
-                        Destination URLs (minimum 2)
-                      </label>
-                      {randomizerUrls.map((url, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <Input
-                            type="url"
-                            placeholder={`https://example.com/destination-${index + 1}`}
-                            value={url}
-                            onChange={(e) => updateRandomizerUrl(index, e.target.value)}
-                            required
-                            className="h-12 text-sm flex-1 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
-                          />
-                          {randomizerUrls.length > 2 && (
-                            <button
-                              type="button"
-                              onClick={() => removeRandomizerUrl(index)}
-                              className="p-2 hover:bg-muted rounded-full transition-colors shrink-0"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={addRandomizerUrl}
-                        className="w-full rounded-full"
+                      <Button 
+                        type="submit" 
+                        className="w-full h-12 text-sm rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add URL
+                        Next <ArrowRight className="w-5 h-5 ml-2" />
                       </Button>
-                    </div>
 
-                    {showCustomize && (
-                      <div>
-                        <label htmlFor="custom-slug-randomizer" className="block text-sm font-medium mb-2">
-                          Customize your link (optional)
-                        </label>
-                        <div className="flex items-center gap-2 w-full">
-                          <span className="text-sm text-muted-foreground whitespace-nowrap shrink-0">blackcollar.io/</span>
-                          <Input
-                            id="custom-slug-randomizer"
-                            type="text"
-                            placeholder="my-randomizer"
-                            value={customSlug}
-                            onChange={(e) => setCustomSlug(e.target.value)}
-                            className="h-12 text-sm flex-1 min-w-0 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
-                          />
+                      {/* Step Indicator */}
+                      <div className="flex items-center justify-center mt-4">
+                        <div className="flex items-center">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 1 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            1
+                          </div>
+                          <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-black dark:bg-white' : 'bg-muted'}`} />
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 2 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            2
+                          </div>
+                          <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-black dark:bg-white' : 'bg-muted'}`} />
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 3 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            3
+                          </div>
                         </div>
                       </div>
-                    )}
+                    </form>
+                  )}
 
-                    <Button 
-                      type="submit" 
-                      className="w-full h-12 text-sm rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
-                    >
-                      <Target className="w-5 h-5 mr-2" />
-                      Create Randomizer
-                    </Button>
+                  {/* Step 2: Name It */}
+                  {currentStep === 2 && (
+                    <form onSubmit={handleStep2Submit} className="space-y-4">
+                      <button
+                        type="button"
+                        onClick={handleBackStep}
+                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back
+                      </button>
 
+                      <div className="text-center mb-4">
+                        
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="name" className="block font-medium mb-2 text-[15px] text-center">
+                          Give it a name (Optional)
+                        </label>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="My Experience"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                        />
+                      </div>
+
+                      <Button 
+                        type="submit" 
+                        className="w-full h-12 text-sm rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
+                      >
+                        Next <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+
+                      <button
+                        type="button"
+                        onClick={handleSkipStep2}
+                        className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
+                      >
+                        Skip
+                      </button>
+
+                      {/* Step Indicator */}
+                      <div className="flex items-center justify-center mt-4">
+                        <div className="flex items-center">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 1 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            1
+                          </div>
+                          <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-black dark:bg-white' : 'bg-muted'}`} />
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 2 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            2
+                          </div>
+                          <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-black dark:bg-white' : 'bg-muted'}`} />
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 3 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            3
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* Step 3: Almost Done */}
+                  {currentStep === 3 && (
+                    <form onSubmit={handleFinalSubmit} className="space-y-4">
+                      <button
+                        type="button"
+                        onClick={handleBackStep}
+                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back
+                      </button>
+
+                      <div className="text-center mb-4">
+                        
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="userName" className="block font-medium mb-2 text-[15px] text-center">
+                          Your Name
+                        </label>
+                        <Input
+                          id="userName"
+                          type="text"
+                          placeholder="Jane Smith"
+                          value={formData.userName}
+                          onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                          required
+                          className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="email" className="block font-medium mb-2 text-[15px] text-center">
+                          Your Email
+                        </label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          required
+                          className="h-12 text-sm w-full rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
+                        />
+                      </div>
+
+                      <Button 
+                        type="submit" 
+                        className="w-full h-12 text-sm rounded-full bg-white text-black hover:bg-white/90"
+                      >
+                        Create Your Experience <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+
+                      {/* Step Indicator */}
+                      <div className="flex items-center justify-center mt-4">
+                        <div className="flex items-center">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 1 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            1
+                          </div>
+                          <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-black dark:bg-white' : 'bg-muted'}`} />
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 2 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            2
+                          </div>
+                          <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-black dark:bg-white' : 'bg-muted'}`} />
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 3 ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-muted text-muted-foreground'}`}>
+                            3
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Confirmation Screen */}
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl mb-8 text-center">
+                  Your Experience is Almost Live
+                </h1>
+
+                {/* Link Box with Copy */}
+                <div className="bg-card/50 backdrop-blur-md rounded-lg p-6 mb-8 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                  <div className="flex items-center justify-between gap-4">
+                    <code className="flex-1 text-primary font-medium text-lg break-all">{generatedLink}</code>
                     <button
-                      type="button"
-                      onClick={() => setShowCustomize(!showCustomize)}
-                      className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
-                    >
-                      {showCustomize ? 'Hide customization' : 'Customize'}
-                    </button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-
-              {shortUrl && (
-                <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-2">Your shortened link:</p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 text-primary font-medium">{shortUrl}</code>
-                    <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={copyToClipboard}
+                      className="p-3 hover:bg-muted rounded-full transition-colors shrink-0"
+                      aria-label="Copy link"
                     >
-                      <Copy className="w-4 h-4" />
-                    </Button>
+                      <Copy className="w-5 h-5" />
+                    </button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    <Link to="/auth" className="text-primary hover:underline">Sign up</Link> to track clicks and manage your links
-                  </p>
+                  {copySuccess && (
+                    <p className="text-sm text-muted-foreground mt-2 text-center">Copied!</p>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Stats Cards */}
-            
+                {/* Activation Steps */}
+                <div className="bg-card/50 backdrop-blur-md rounded-lg p-6 sm:p-8 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                  <h2 className="text-2xl font-semibold mb-6 text-center">To activate tracking analytics:</h2>
+
+                  {/* Step 1: Program NFC */}
+                  <div className="mb-8">
+                    <h3 className="text-xl font-semibold mb-3">
+                      📲 Program your NFC device
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                      Ready to program your device? Follow our simple guide to get your NFC product live in minutes.
+                    </p>
+                    <a 
+                      href="https://www.blackcollar.io/blogs/programming-guides"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 rounded-full">
+                        View Programming Guide <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </a>
+                  </div>
+
+                  {/* Step 2: Confirm Email */}
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold mb-3">
+                      📧 Confirm your email
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Check your inbox and confirm your email address to start receiving your weekly tap insights.
+                    </p>
+                  </div>
+
+                  {/* Help Text */}
+                  <div className="text-center mt-8 pt-6 border-t border-muted">
+                    <p className="text-sm text-muted-foreground">
+                      Need help? Email us at <a href="mailto:info@blackcollar.io" className="text-primary hover:underline">info@blackcollar.io</a>
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="px-4 py-16 sm:py-24 bg-muted/30">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl text-center mb-12">
-              Why Choose Blackcollar.io?
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Link2 className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">Custom Short Links</h3>
-                <p className="text-sm text-muted-foreground">
-                  Create branded short links that reflect your brand identity
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">Detailed Analytics</h3>
-                <p className="text-sm text-muted-foreground">
-                  Track clicks, locations, devices, and more in real-time
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">Lightning Fast</h3>
-                <p className="text-sm text-muted-foreground">
-                  Instant link generation with sub-millisecond redirects
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">Secure & Reliable</h3>
-                <p className="text-sm text-muted-foreground">
-                  Enterprise-grade security with 99.9% uptime guarantee
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="px-4 py-16 sm:py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl sm:text-4xl mb-6">
-              Ready to Get Started?
-            </h2>
-            <p className="text-muted-foreground mb-8 text-[16px]">
-              Join thousands of users who trust Blackcollar.io for their link management needs
-            </p>
-            <Link to="/auth">
-              <Button size="lg" className="h-12 px-8 rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90">
-                Create Your Account
-              </Button>
-            </Link>
-          </div>
-        </section>
       </main>
 
       <Footer />

@@ -46,6 +46,7 @@ export function BookACallPage() {
       <Header customNavItems={[
         { label: 'Products', href: 'https://www.blackcollar.io' },
         { label: 'Use Cases', href: '/use-cases' },
+        { label: 'Pricing', href: '/pricing' },
         { label: 'Book a Call', href: '/book-a-call' },
       ]} />
 

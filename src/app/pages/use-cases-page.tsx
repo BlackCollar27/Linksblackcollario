@@ -2,90 +2,47 @@ import { Header } from '../components/header';
 import { Footer } from '../components/footer';
 import { Link } from 'react-router';
 import { 
-  Megaphone, 
-  ShoppingBag, 
-  Share2, 
-  Users, 
-  TrendingUp, 
-  Radio,
+  Sparkles, 
+  BarChart3, 
+  Target, 
+  Share2,
   ArrowRight,
-  CheckCircle2
+  Check,
+  Shuffle
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export function UseCasesPage() {
-  const useCases = [
+  const pillars = [
     {
-      icon: Megaphone,
-      title: 'Marketing Campaigns',
-      description: 'Track performance across multiple marketing channels with branded short links. Perfect for email campaigns, social media ads, and content marketing.',
+      icon: Sparkles,
+      title: 'Stand Out',
+      description: 'For businesses and individuals alike — create a modern experience that makes you unforgettable the moment someone gets close.',
       features: [
-        'Campaign-level analytics',
-        'UTM parameter tracking',
-        'A/B testing with randomizers',
-        'Multi-channel attribution'
-      ],
-      color: 'text-blue-500'
+        'Custom branded NFC products',
+        'Instant smartphone activation',
+        'No app required'
+      ]
     },
     {
-      icon: ShoppingBag,
-      title: 'E-commerce',
-      description: 'Share product links that are memorable and trackable. Monitor which channels drive the most sales and optimize your marketing spend.',
+      icon: BarChart3,
+      title: 'Capture Insights',
+      description: 'Every tap tells a story. Know exactly what\'s working in real time.',
       features: [
-        'Product link tracking',
-        'Conversion analytics',
-        'Affiliate link management',
-        'Mobile-optimized redirects'
-      ],
-      color: 'text-green-500'
+        'Real time tap analytics',
+        'Multi location dashboards',
+        'Campaign level reporting'
+      ]
     },
     {
-      icon: Share2,
-      title: 'Social Media Marketing',
-      description: 'Create clean, shareable links for Instagram, Twitter, TikTok, and more. Track engagement and clicks from each platform.',
+      icon: Target,
+      title: 'Make Smarter Decisions',
+      description: 'Your data works for you around the clock so you never have to guess.',
       features: [
-        'Bio link management',
-        'Story link tracking',
-        'Platform-specific analytics',
-        'Click-through rate optimization'
-      ],
-      color: 'text-purple-500'
-    },
-    {
-      icon: Users,
-      title: 'Team Collaboration',
-      description: 'Manage links across teams with organized campaigns and shared workspaces. Perfect for agencies and marketing teams.',
-      features: [
-        'Team workspaces',
-        'Role-based permissions',
-        'Shared campaign folders',
-        'Collaborative analytics'
-      ],
-      color: 'text-orange-500'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Influencer Marketing',
-      description: 'Track influencer campaign performance with unique links for each creator. Measure ROI and optimize partnerships.',
-      features: [
-        'Influencer-specific links',
-        'Performance benchmarking',
-        'Commission tracking',
-        'Campaign reporting'
-      ],
-      color: 'text-pink-500'
-    },
-    {
-      icon: Radio,
-      title: 'Content Distribution',
-      description: 'Distribute content across multiple platforms with one short link. Track where your audience engages most.',
-      features: [
-        'Cross-platform tracking',
-        'Audience insights',
-        'Geographic analytics',
-        'Device breakdown'
-      ],
-      color: 'text-cyan-500'
+        'Real time engagement tracking',
+        'Device and location breakdowns',
+        'Actionable daily insights'
+      ]
     }
   ];
 
@@ -94,46 +51,50 @@ export function UseCasesPage() {
       <Header customNavItems={[
         { label: 'Products', href: 'https://www.blackcollar.io' },
         { label: 'Use Cases', href: '/use-cases' },
+        { label: 'Pricing', href: '/pricing' },
         { label: 'Book a Call', href: '/book-a-call' },
       ]} />
 
       <main className="flex-1 pt-20">
+        {/* Subtle background pattern for glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        
         {/* Hero Section */}
-        <section className="px-4 py-16 sm:py-24">
+        <section className="px-4 py-16 sm:py-24 relative">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl mb-6">
-                Link Management for Every Use Case
+              <h1 className="mb-6 text-[32px]">
+                A Modern Experience for Every Person and Every Business
               </h1>
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-                From marketing campaigns to e-commerce, discover how Blackcollar.io helps teams track, manage, and optimize their links.
+              <p className="text-muted-foreground max-w-4xl mx-auto text-[16px]">
+                Smart NFC products that help you stand out, capture insights, and make smarter decisions every day.
               </p>
             </div>
 
-            {/* Use Cases Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {useCases.map((useCase) => {
-                const Icon = useCase.icon;
+            {/* Pillars Grid - 3 columns */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {pillars.map((pillar) => {
+                const Icon = pillar.icon;
                 return (
                   <div 
-                    key={useCase.title}
-                    className="bg-card/50 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] rounded-lg p-6 hover:shadow-xl transition-shadow"
+                    key={pillar.title}
+                    className="bg-card/50 backdrop-blur-md rounded-lg p-8 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition-shadow"
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <div className={`${useCase.color} bg-muted rounded-lg p-3`}>
+                      <div className="bg-black dark:bg-white text-white dark:text-black p-3 rounded-lg">
                         <Icon className="w-6 h-6" />
                       </div>
-                      <h2 className="text-xl font-semibold">{useCase.title}</h2>
+                      <h2 className="text-2xl font-semibold">{pillar.title}</h2>
                     </div>
                     
-                    <p className="text-muted-foreground mb-6">
-                      {useCase.description}
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      {pillar.description}
                     </p>
 
                     <ul className="space-y-3">
-                      {useCase.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      {pillar.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-3">
+                          <span className="text-black dark:text-white flex-shrink-0 mt-0.5">—</span>
                           <span className="text-sm">{feature}</span>
                         </li>
                       ))}
@@ -146,24 +107,24 @@ export function UseCasesPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="px-4 py-16 sm:py-24 bg-gradient-to-br from-primary/10 via-transparent to-primary/5">
+        <section className="px-4 py-16 sm:py-24 relative bg-background">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl mb-6">
-              Ready to get started?
+            <h2 className="mb-6 text-[32px]">
+              Ready to create a modern experience?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of teams using Blackcollar.io to manage and track their links across all marketing channels.
+            <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
+              Let's talk about what's possible for you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/auth">
-                <Button size="lg" className="rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 px-8">
-                  Start Free Trial
+                <Button size="lg" className="bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 px-8 rounded-full">
+                  Start For Free
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               <Link to="/book-a-call">
-                <Button size="lg" variant="outline" className="rounded-full px-8">
-                  Schedule a Demo
+                <Button size="lg" variant="outline" className="px-8 rounded-full">
+                  Book a Discovery Call
                 </Button>
               </Link>
             </div>

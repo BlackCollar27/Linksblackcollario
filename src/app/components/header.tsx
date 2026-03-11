@@ -66,7 +66,7 @@ export function Header({ onMenuToggle, customNavItems }: HeaderProps) {
   // Default nav items if not provided
   const defaultNavItems = [
     { label: 'Features', href: '#' },
-    { label: 'Pricing', href: '#' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'About', href: '#' },
   ];
 

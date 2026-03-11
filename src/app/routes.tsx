@@ -20,6 +20,7 @@ import { WorkspaceDetailPage } from "./pages/workspace-detail-page";
 import { SettingsPage } from "./pages/settings-page";
 import { UseCasesPage } from "./pages/use-cases-page";
 import { BookACallPage } from "./pages/book-a-call-page";
+import { PricingPage } from "./pages/pricing-page";
 
 function RootLayout() {
   return (
@@ -114,6 +115,10 @@ export const router = createBrowserRouter([
       {
         path: "/book-a-call",
         Component: BookACallPage,
+      },
+      {
+        path: "/pricing",
+        Component: PricingPage,
       },
     ],
   },

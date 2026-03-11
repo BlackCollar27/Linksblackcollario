@@ -124,11 +124,11 @@ export function LinkDetailPage() {
   ];
 
   const locationData = [
-    { country: 'United States', clicks: 425 },
-    { country: 'United Kingdom', clicks: 312 },
-    { country: 'Canada', clicks: 198 },
-    { country: 'Germany', clicks: 145 },
-    { country: 'Australia', clicks: 167 },
+    { city: 'New York', clicks: 425 },
+    { city: 'London', clicks: 312 },
+    { city: 'Toronto', clicks: 198 },
+    { city: 'Berlin', clicks: 167 },
+    { city: 'Sydney', clicks: 145 },
   ];
 
   // Mock individual clicks data - replace with API call to Rails backend
@@ -484,7 +484,7 @@ export function LinkDetailPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Clicks Over Time Chart */}
                   <div className="bg-muted/10 backdrop-blur-md rounded-lg p-6 border border-border/30">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+                    <div className="flex flex-col mb-4 gap-3">
                       <h3 className="text-lg font-semibold">Clicks Over Time</h3>
                       
                       {/* Time Period Selector */}
@@ -556,20 +556,22 @@ export function LinkDetailPage() {
                   {/* Top Locations */}
                   <div className="bg-muted/10 backdrop-blur-md rounded-lg p-6 border border-border/30 lg:col-span-2">
                     <h3 className="text-lg font-semibold mb-4">Top Locations</h3>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <BarChart data={locationData}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                        <XAxis dataKey="country" className="text-xs" angle={-45} textAnchor="end" height={80} />
-                        <YAxis className="text-xs" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--background))', 
-                            border: '1px solid hsl(var(--border))' 
-                          }} 
-                        />
-                        <Bar dataKey="clicks" fill="#34A853" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    <div className="space-y-3">
+                      {locationData.map((location, index) => (
+                        <div key={location.city} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/10 dark:bg-white/10 text-sm font-semibold">
+                              {index + 1}
+                            </div>
+                            <span className="font-medium">{location.city}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-semibold">{location.clicks.toLocaleString()}</div>
+                            <div className="text-xs text-muted-foreground">clicks</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

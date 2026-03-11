@@ -164,7 +164,7 @@ export function LinkEditPage() {
 
         <div className="space-y-6">
           {/* Link Name */}
-          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg">
+          <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Link Name (Optional)</h2>
             <div className="space-y-2">
               
@@ -174,14 +174,14 @@ export function LinkEditPage() {
                 value={linkName}
                 onChange={(e) => setLinkName(e.target.value)}
                 placeholder="e.g., Spring Campaign Link"
-                className="h-11"
+                className="h-11 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
               />
               <p className="text-xs text-muted-foreground">Give this link a memorable name for easy identification</p>
             </div>
           </div>
 
           {/* Link Type Toggle */}
-          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg shadow-lg">
+          <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg">
             <button
               onClick={() => setIsLinkTypeOpen(!isLinkTypeOpen)}
               className="w-full p-6 flex items-center justify-between hover:bg-muted/10 transition-colors"
@@ -196,33 +196,29 @@ export function LinkEditPage() {
             
             {isLinkTypeOpen && (
               <div className="px-6 pb-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-2 mb-6 p-2 bg-muted/50 dark:bg-muted/20 rounded-full">
                   <button
+                    type="button"
                     onClick={() => setIsRandomizer(false)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`py-3 rounded-full transition-all ${
                       !isRandomizer
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:border-muted-foreground'
+                        ? 'bg-black dark:bg-white text-white dark:text-black'
+                        : 'text-foreground'
                     }`}
                   >
-                    <div className="font-medium mb-1">Single Destination</div>
-                    <div className="text-sm text-muted-foreground">
-                      Link to one URL
-                    </div>
+                    <div className="font-medium">Single Destination</div>
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => setIsRandomizer(true)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`py-3 rounded-full transition-all ${
                       isRandomizer
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:border-muted-foreground'
+                        ? 'bg-black dark:bg-white text-white dark:text-black'
+                        : 'text-foreground'
                     }`}
                   >
-                    <div className="font-medium mb-1">Randomized Pool</div>
-                    <div className="text-sm text-muted-foreground">
-                      Distribute to multiple URLs
-                    </div>
+                    <div className="font-medium">Randomized Pool</div>
                   </button>
                 </div>
 
@@ -236,7 +232,7 @@ export function LinkEditPage() {
                       value={destinationUrl}
                       onChange={(e) => setDestinationUrl(e.target.value)}
                       placeholder="https://example.com/destination"
-                      className="h-11"
+                      className="h-11 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                     />
                   </div>
                 )}
@@ -265,7 +261,7 @@ export function LinkEditPage() {
                               onChange={(e) =>
                                 updatePoolEntry(entry.id, 'url', e.target.value)
                               }
-                              className="h-10"
+                              className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                             />
                             <div className="flex items-center gap-2">
                               <Input
@@ -277,7 +273,7 @@ export function LinkEditPage() {
                                 }
                                 min="0"
                                 max="100"
-                                className="h-10 w-24"
+                                className="h-10 w-24 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                               />
                               <span className="text-sm text-muted-foreground">
                                 % of traffic
@@ -317,7 +313,7 @@ export function LinkEditPage() {
           </div>
 
           {/* Campaign Assignment */}
-          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg shadow-lg">
+          <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg">
             <button
               onClick={() => setIsCampaignOpen(!isCampaignOpen)}
               className="w-full p-6 flex items-center justify-between hover:bg-muted/10 transition-colors"
@@ -336,7 +332,7 @@ export function LinkEditPage() {
               <Label htmlFor="campaign">Assign to Campaign (Optional)</Label>
               <select
                 id="campaign"
-                className="w-full h-11 px-3 rounded-md border border-border bg-background"
+                className="w-full h-11 px-3 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
               >
                 <option value="">No Campaign</option>
                 <option value="1">Summer Sale</option>
@@ -349,7 +345,7 @@ export function LinkEditPage() {
           </div>
 
           {/* UTM Parameters */}
-          <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg shadow-lg">
+          <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg">
             <button
               onClick={() => setIsUtmOpen(!isUtmOpen)}
               className="w-full p-6 flex items-center justify-between hover:bg-muted/10 transition-colors"
@@ -378,7 +374,7 @@ export function LinkEditPage() {
                   value={utmSource}
                   onChange={(e) => setUtmSource(e.target.value)}
                   placeholder="e.g., google, newsletter, facebook"
-                  className="h-10"
+                  className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                 />
                 <p className="text-xs text-muted-foreground">Identify the source of your traffic</p>
               </div>
@@ -391,7 +387,7 @@ export function LinkEditPage() {
                   value={utmMedium}
                   onChange={(e) => setUtmMedium(e.target.value)}
                   placeholder="e.g., cpc, email, social"
-                  className="h-10"
+                  className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                 />
                 <p className="text-xs text-muted-foreground">Identify the marketing medium</p>
               </div>
@@ -404,7 +400,7 @@ export function LinkEditPage() {
                   value={utmCampaign}
                   onChange={(e) => setUtmCampaign(e.target.value)}
                   placeholder="e.g., spring_sale, product_launch"
-                  className="h-10"
+                  className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                 />
                 <p className="text-xs text-muted-foreground">Identify the specific campaign</p>
               </div>
@@ -417,7 +413,7 @@ export function LinkEditPage() {
                   value={utmTerm}
                   onChange={(e) => setUtmTerm(e.target.value)}
                   placeholder="e.g., running+shoes"
-                  className="h-10"
+                  className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                 />
                 <p className="text-xs text-muted-foreground">Identify paid search keywords</p>
               </div>
@@ -430,7 +426,7 @@ export function LinkEditPage() {
                   value={utmContent}
                   onChange={(e) => setUtmContent(e.target.value)}
                   placeholder="e.g., logolink, textlink"
-                  className="h-10"
+                  className="h-10 rounded-full bg-muted border-0 focus:ring-0 focus:outline-none"
                 />
                 <p className="text-xs text-muted-foreground">Differentiate similar content or links</p>
               </div>
@@ -455,7 +451,7 @@ export function LinkEditPage() {
           </Button>
 
           {/* Danger Zone */}
-          <div className="bg-card/50 backdrop-blur-md border border-destructive/30 rounded-lg p-6 shadow-lg">
+          <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6">
             <div className="mb-4">
               <h2 className="text-xl font-semibold text-destructive mb-1">Danger Zone</h2>
               <p className="text-sm text-muted-foreground">

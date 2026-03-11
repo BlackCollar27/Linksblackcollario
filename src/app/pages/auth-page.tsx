@@ -42,9 +42,9 @@ export function AuthPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header customNavItems={[
-        { label: 'Products', href: '#' },
-        { label: 'Use Cases', href: '#' },
-        { label: 'Book a Call', href: '#' },
+        { label: 'Products', href: 'https://www.blackcollar.io' },
+        { label: 'Use Cases', href: '/use-cases' },
+        { label: 'Pricing', href: '/pricing' },
       ]} />
 
       {/* Main Content */}

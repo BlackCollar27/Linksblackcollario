@@ -31,7 +31,7 @@ export function PricingPage() {
         '1 location',
         'Up to 20 links',
         'Multiple devices',
-        '1 active campaign',
+        '2 campaigns',
         'Tap analytics dashboard'
       ],
       buttonText: 'Get Started',

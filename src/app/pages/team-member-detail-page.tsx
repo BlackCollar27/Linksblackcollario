@@ -250,14 +250,14 @@ export function TeamMemberDetailPage() {
 
           {/* Member Info Cards */}
           <div className="grid sm:grid-cols-2 gap-4 mb-8">
-            <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg">
+            <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6">
               <div className="flex items-center gap-3 mb-2">
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">Email</p>
               </div>
               <p className="text-sm font-medium break-all">{formData.email}</p>
             </div>
-            <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg">
+            <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6">
               <div className="flex items-center gap-3 mb-2">
                 <Calendar className="w-5 h-5 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">Joined</p>
@@ -270,17 +270,17 @@ export function TeamMemberDetailPage() {
           <div className="mb-8">
             <h2 className="text-[20px] font-light text-center mb-4">Activity Overview</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg text-center">
+              <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6 text-center">
                 <Link2 className="w-6 h-6 text-primary mx-auto mb-2" />
                 <p className="text-2xl font-semibold mb-1">{stats.linksCreated}</p>
                 <p className="text-xs text-muted-foreground">Links Created</p>
               </div>
-              <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg text-center">
+              <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6 text-center">
                 <MousePointerClick className="w-6 h-6 text-primary mx-auto mb-2" />
                 <p className="text-2xl font-semibold mb-1">{stats.totalClicks.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Total Clicks</p>
               </div>
-              <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg text-center col-span-2 sm:col-span-1">
+              <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6 text-center col-span-2 sm:col-span-1">
                 <FolderKanban className="w-6 h-6 text-primary mx-auto mb-2" />
                 <p className="text-2xl font-semibold mb-1">{stats.campaigns}</p>
                 <p className="text-xs text-muted-foreground">Campaigns</p>
@@ -292,7 +292,7 @@ export function TeamMemberDetailPage() {
           {stats.workspaces.length > 0 && (
             <div className="mb-8">
               <h2 className="text-[20px] font-light text-center mb-4">Workspaces</h2>
-              <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg">
+              <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6">
                 <div className="space-y-3">
                   {stats.workspaces.map((workspace, index) => (
                     <div
@@ -312,7 +312,7 @@ export function TeamMemberDetailPage() {
           {recentClicks.length > 0 && (
             <div className="mb-8">
               <h2 className="text-[20px] font-light text-center mb-4">Recent Clicks</h2>
-              <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg">
+              <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6">
                 <div className="space-y-3">
                   {recentClicks.map((click) => (
                     <div
@@ -346,7 +346,7 @@ export function TeamMemberDetailPage() {
 
           {/* Edit Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-card/50 backdrop-blur-md border border-border/30 rounded-lg p-6 shadow-lg space-y-6">
+            <div className="bg-card/50 backdrop-blur-md shadow-lg rounded-lg p-6 space-y-6">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Shield className="w-5 h-5" />
                 Member Settings

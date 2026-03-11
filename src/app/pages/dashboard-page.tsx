@@ -4,6 +4,7 @@ import { AppLayout } from '../components/app-layout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
+import { UserGuide } from '../components/user-guide';
 import { 
   Link as LinkIcon, 
   Copy, 
@@ -201,6 +202,7 @@ export function DashboardPage() {
 
   return (
     <AppLayout>
+      <UserGuide />
       <div className="w-full overflow-x-hidden min-h-screen bg-background relative">
         {/* Subtle background pattern for glass effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
@@ -218,7 +220,7 @@ export function DashboardPage() {
           </p>
 
           {/* Link Shortener Form */}
-          <div className="bg-card/50 backdrop-blur-md rounded-lg p-4 mb-6 w-full bg-[#ffffff00]">
+          <div id="link-creator-form" className="bg-card/50 backdrop-blur-md rounded-lg p-4 mb-6 w-full bg-[#ffffff00]">
             <Tabs defaultValue="single" className="w-full">
               <TabsList className="w-full mb-4 grid grid-cols-2 h-auto gap-2 p-2 bg-muted/50 dark:bg-muted/20">
                 <TabsTrigger value="single" className="py-3 rounded-full data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black">
@@ -353,6 +355,7 @@ export function DashboardPage() {
 
                   <button
                     type="button"
+                    id="customize-button"
                     onClick={() => setShowCustomSlug(!showCustomSlug)}
                     className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
                   >
@@ -463,6 +466,7 @@ export function DashboardPage() {
 
                   <button
                     type="button"
+                    id="customize-button"
                     onClick={() => setShowCustomSlug(!showCustomSlug)}
                     className="w-full text-sm text-center text-muted-foreground hover:text-foreground underline"
                   >
@@ -498,7 +502,7 @@ export function DashboardPage() {
           <div className="max-w-7xl mx-auto">
             <div className="space-y-12 w-full">
               {/* Recent Links */}
-              <div className="w-full">
+              <div id="recent-links-section" className="w-full">
                 <div className="flex flex-col items-center mb-6 gap-2">
                   <h2 className="text-center text-[32px]">Recent Links</h2>
                   <Button 
@@ -554,7 +558,7 @@ export function DashboardPage() {
               </div>
 
               {/* Campaign Stats */}
-              <div className="w-full">
+              <div id="recent-campaigns-section" className="w-full">
                 <div className="flex flex-col items-center mb-6 gap-2">
                   <h2 className="text-center text-[32px]">Recent Campaigns</h2>
                   <Button 

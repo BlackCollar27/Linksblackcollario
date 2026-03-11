@@ -35,6 +35,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="flex pt-[73px] w-full">
         {/* Sidebar - visible on desktop, toggleable on mobile */}
         <Sidebar 
+          id="app-sidebar"
           isOpen={isSidebarOpen} 
           onClose={() => setIsSidebarOpen(false)}
           isDesktopCollapsed={isDesktopSidebarCollapsed}

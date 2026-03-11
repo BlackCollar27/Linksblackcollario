@@ -1,8 +1,10 @@
 import { createBrowserRouter, Outlet } from "react-router";
 import { AuthProvider } from "./contexts/auth-context";
 import { ThemeProvider } from "./contexts/theme-context";
+import { ProtectedRoute } from "./components/protected-route";
 import { LandingPage } from "./pages/landing-page";
 import { AuthPage } from "./pages/auth-page";
+import { VerifyPage } from "./pages/verify-page";
 import { DashboardPage } from "./pages/dashboard-page";
 import { LinksPage } from "./pages/links-page";
 import { LinkDetailPage } from "./pages/link-detail-page";
@@ -45,68 +47,72 @@ export const router = createBrowserRouter([
         Component: AuthPage,
       },
       {
+        path: "/auth/verify",
+        Component: VerifyPage,
+      },
+      {
         path: "/dashboard",
-        Component: DashboardPage,
+        element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
       },
       {
         path: "/links",
-        Component: LinksPage,
+        element: <ProtectedRoute><LinksPage /></ProtectedRoute>,
       },
       {
         path: "/links/:linkId",
-        Component: LinkDetailPage,
+        element: <ProtectedRoute><LinkDetailPage /></ProtectedRoute>,
       },
       {
         path: "/links/:linkId/edit",
-        Component: LinkEditPage,
+        element: <ProtectedRoute><LinkEditPage /></ProtectedRoute>,
       },
       {
         path: "/campaigns",
-        Component: CampaignsPage,
+        element: <ProtectedRoute><CampaignsPage /></ProtectedRoute>,
       },
       {
         path: "/campaigns/new",
-        Component: CampaignFormPage,
+        element: <ProtectedRoute><CampaignFormPage /></ProtectedRoute>,
       },
       {
         path: "/campaigns/:campaignId",
-        Component: CampaignDetailPage,
+        element: <ProtectedRoute><CampaignDetailPage /></ProtectedRoute>,
       },
       {
         path: "/campaigns/:campaignId/add-links",
-        Component: CampaignAddLinksPage,
+        element: <ProtectedRoute><CampaignAddLinksPage /></ProtectedRoute>,
       },
       {
         path: "/campaigns/:campaignId/edit",
-        Component: CampaignFormPage,
+        element: <ProtectedRoute><CampaignFormPage /></ProtectedRoute>,
       },
       {
         path: "/analytics",
-        Component: GlobalAnalyticsPage,
+        element: <ProtectedRoute><GlobalAnalyticsPage /></ProtectedRoute>,
       },
       {
         path: "/analytics/:linkId",
-        Component: AnalyticsPage,
+        element: <ProtectedRoute><AnalyticsPage /></ProtectedRoute>,
       },
       {
         path: "/team",
-        Component: TeamPage,
+        element: <ProtectedRoute><TeamPage /></ProtectedRoute>,
       },
       {
         path: "/team/:memberId",
-        Component: TeamMemberDetailPage,
+        element: <ProtectedRoute><TeamMemberDetailPage /></ProtectedRoute>,
       },
       {
         path: "/workspaces",
-        Component: WorkspacesPage,
+        element: <ProtectedRoute><WorkspacesPage /></ProtectedRoute>,
       },
       {
         path: "/workspaces/:workspaceId",
-        Component: WorkspaceDetailPage,
+        element: <ProtectedRoute><WorkspaceDetailPage /></ProtectedRoute>,
       },
       {
         path: "/settings",
-        Component: SettingsPage,
+        element: <ProtectedRoute><SettingsPage /></ProtectedRoute>,
       },
       {
         path: "/use-cases",

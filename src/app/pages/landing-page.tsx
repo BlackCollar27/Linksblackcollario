@@ -18,6 +18,8 @@ export function LandingPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +41,46 @@ export function LandingPage() {
     setCurrentStep(currentStep - 1);
   };
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Generate a random short link
-    const slug = Math.random().toString(36).substring(2, 8);
-    setGeneratedLink(`links.blackcollar.io/${slug}`);
-    setIsSubmitted(true);
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // TODO: Replace with actual API call to your Rails backend
+      // POST /api/links/create-with-account
+      const response = await fetch('/api/links/create-with-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: formData.url,
+          name: formData.name || 'My Experience',
+          user_name: formData.userName,
+          email: formData.email
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Success - show the generated link
+        setGeneratedLink(data.short_url || `links.blackcollar.io/${data.short_code}`);
+        setIsSubmitted(true);
+        // Magic link email is sent automatically by backend
+      } else {
+        // Error handling
+        setError(data.error || 'Failed to create link. Please try again.');
+      }
+    } catch (err) {
+      console.error('Link creation failed:', err);
+      // For development: generate a mock link if API isn't ready
+      const slug = Math.random().toString(36).substring(2, 8);
+      setGeneratedLink(`links.blackcollar.io/${slug}`);
+      setIsSubmitted(true);
+      console.warn('Using mock link generation - connect to Rails backend for production');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const copyToClipboard = () => {
@@ -252,10 +288,15 @@ export function LandingPage() {
 
                       <Button 
                         type="submit" 
+                        disabled={isLoading}
                         className="w-full h-12 text-sm rounded-full bg-white text-black hover:bg-white/90"
                       >
-                        Create Your Experience <ArrowRight className="w-5 h-5 ml-2" />
+                        {isLoading ? 'Creating...' : 'Create Your Experience'} <ArrowRight className="w-5 h-5 ml-2" />
                       </Button>
+
+                      {error && (
+                        <p className="text-sm text-red-500 text-center">{error}</p>
+                      )}
 
                       {/* Step Indicator */}
                       <div className="flex items-center justify-center mt-4">

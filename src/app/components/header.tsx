@@ -26,7 +26,7 @@ export function Header({ onMenuToggle, customNavItems }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -58,9 +58,10 @@ export function Header({ onMenuToggle, customNavItems }: HeaderProps) {
     setIsMenuOpen(false);
   };
 
-  const handleSignOut = () => {
-    // TODO: Replace with actual sign out logic (clear auth tokens, etc.)
-    window.location.href = '/';
+  const handleSignOut = async () => {
+    await logout();
+    navigate('/');
+    setIsMenuOpen(false);
   };
 
   // Default nav items if not provided

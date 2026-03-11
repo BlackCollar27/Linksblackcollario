@@ -19,13 +19,14 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
+  id?: string;
   isOpen: boolean;
   onClose: () => void;
   isDesktopCollapsed?: boolean;
   onDesktopToggle?: () => void;
 }
 
-export function Sidebar({ isOpen, onClose, isDesktopCollapsed, onDesktopToggle }: SidebarProps) {
+export function Sidebar({ id, isOpen, onClose, isDesktopCollapsed, onDesktopToggle }: SidebarProps) {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { isDark, toggleTheme } = useTheme();
@@ -155,7 +156,7 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed, onDesktopToggle }
       )}
 
       {/* Sidebar - Desktop Only, Hidden on Mobile */}
-      <aside className={`hidden lg:block fixed top-[89px] left-0 bottom-0 bg-card/50 backdrop-blur-md shadow-sm z-10 transition-all duration-300 ${isDesktopCollapsed ? 'w-16' : 'w-64'}`}>
+      <aside id={id} className={`hidden lg:block fixed top-[89px] left-0 bottom-0 bg-card/50 backdrop-blur-md shadow-sm z-10 transition-all duration-300 ${isDesktopCollapsed ? 'w-16' : 'w-64'}`}>
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Navigation */}
           <nav className={`flex-1 space-y-1 ${isDesktopCollapsed ? 'p-2' : 'p-4'}`}>

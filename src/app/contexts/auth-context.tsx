@@ -48,15 +48,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      setUser(null);
-      setIsAuthenticated(false);
+      // Backend not connected yet - this is expected in development
+      console.warn('Auth API not available. Using development mode.');
+      
+      // For development: Check if we should be "logged in" based on localStorage
+      const devAuthState = localStorage.getItem('dev_auth_state');
+      if (devAuthState === 'authenticated') {
+        // Mock authenticated user for development
+        setUser({
+          id: 'dev-user-123',
+          email: 'dev@example.com',
+          name: 'Development User',
+          subscriptionTier: 'growth', // Can test different tiers: 'free', 'starter', 'growth', 'enterprise'
+          role: 'owner'
+        });
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const sendMagicLink = async (email: string): Promise<{ success: boolean; message?: string }> => {
+  const sendMagicLink = async (email: string): Promise<{ success: boolean; message: string }> => {
     try {
       // TODO: Replace with actual API call to your Rails backend
       // POST /api/auth/magic-link
@@ -75,6 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Send magic link failed:', error);
+      // Backend not connected - simulate successful send in dev mode
+      if (import.meta.env.DEV) {
+        console.warn('Backend not available. Simulating magic link send for development.');
+        console.log(`📧 Mock magic link would be sent to: ${email}`);
+        console.log(`🔗 In production, user would click link in email to verify.`);
+        console.log(`💡 For testing: Navigate to /auth/verify?token=test-token`);
+        return { 
+          success: true, 
+          message: 'Magic link sent! Check your email (Development Mode - check console).' 
+        };
+      }
       return { success: false, message: 'Network error. Please try again.' };
     }
   };
@@ -101,6 +128,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Verify magic link failed:', error);
+      // Backend not connected - simulate successful verification in dev mode
+      if (import.meta.env.DEV) {
+        console.warn('Backend not available. Simulating token verification for development.');
+        const mockUser: User = {
+          id: 'dev-user-123',
+          email: 'dev@example.com',
+          name: 'Development User',
+          subscriptionTier: 'growth',
+          role: 'owner'
+        };
+        setUser(mockUser);
+        setIsAuthenticated(true);
+        localStorage.setItem('dev_auth_state', 'authenticated');
+        return { success: true, user: mockUser };
+      }
       return { success: false, error: 'Network error. Please try again.' };
     }
   };
@@ -120,10 +162,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: 'include',
       });
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Backend not available - clear dev state
+      console.warn('Logout API not available. Clearing development state.');
+      localStorage.removeItem('dev_auth_state');
     } finally {
       setIsAuthenticated(false);
       setUser(null);
+      localStorage.removeItem('dev_auth_state');
     }
   };
 

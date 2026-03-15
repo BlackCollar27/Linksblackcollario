@@ -2,6 +2,7 @@ import { createBrowserRouter, Outlet } from "react-router";
 import { AuthProvider } from "./contexts/auth-context";
 import { ThemeProvider } from "./contexts/theme-context";
 import { ProtectedRoute } from "./components/protected-route";
+import { DevAuthToggle } from "./components/dev-auth-toggle";
 import { LandingPage } from "./pages/landing-page";
 import { AuthPage } from "./pages/auth-page";
 import { VerifyPage } from "./pages/verify-page";
@@ -29,6 +30,7 @@ function RootLayout() {
     <ThemeProvider>
       <AuthProvider>
         <Outlet />
+        <DevAuthToggle />
       </AuthProvider>
     </ThemeProvider>
   );

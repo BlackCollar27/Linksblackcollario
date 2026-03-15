@@ -19,19 +19,32 @@ export function AuthPage() {
     setError('');
     setLoading(true);
 
-    const result = await sendMagicLink(email);
-    
-    setLoading(false);
+    try {
+      const result = await sendMagicLink(email);
+      
+      setLoading(false);
 
-    if (result.success) {
-      setIsSubmitted(true);
-    } else {
-      setError(result.message || 'Failed to send magic link');
+      if (result.success) {
+        setIsSubmitted(true);
+      } else {
+        setError(result.message || 'Failed to send magic link');
+      }
+    } catch (err) {
+      console.error('Magic link request failed:', err);
+      setLoading(false);
+      setError('Backend not connected. Please try again later.');
     }
   };
 
   const handleGoogleAuth = () => {
-    loginWithGoogle();
+    // For development: simulate login
+    if (import.meta.env.DEV) {
+      console.log('Dev mode: Setting authenticated state');
+      localStorage.setItem('dev_auth_state', 'authenticated');
+      window.location.href = '/dashboard';
+    } else {
+      loginWithGoogle();
+    }
   };
 
   return (

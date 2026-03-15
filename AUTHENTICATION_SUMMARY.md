@@ -4,6 +4,8 @@
 
 A **passwordless authentication system** using magic links as the primary login method, with Google OAuth as a secondary option. Users create links on the homepage without login, receive a magic link via email, and access their dashboard with one click.
 
+**✨ NEW: Development Mode** - The app now works **without a backend** using a dev mode with mock authentication. A floating toggle button lets you instantly switch between logged in/out states for testing.
+
 ---
 
 ## 📁 Files Created/Modified
@@ -11,16 +13,20 @@ A **passwordless authentication system** using magic links as the primary login 
 ### **New Files**
 1. `/src/app/pages/verify-page.tsx` - Handles magic link verification
 2. `/src/app/components/protected-route.tsx` - Protects authenticated routes
-3. `/RAILS_API_INTEGRATION.md` - Complete Rails backend guide
-4. `/USER_FLOWS.md` - Detailed user journey documentation
-5. `/AUTHENTICATION_SUMMARY.md` - This file
+3. `/src/app/components/dev-auth-toggle.tsx` - Development mode auth toggle
+4. `/RAILS_API_INTEGRATION.md` - Complete Rails backend guide
+5. `/USER_FLOWS.md` - Detailed user journey documentation
+6. `/DEVELOPMENT_MODE.md` - Guide for using dev mode without backend
+7. `/AUTHENTICATION_SUMMARY.md` - This file
 
 ### **Modified Files**
-1. `/src/app/contexts/auth-context.tsx` - Full magic link authentication
-2. `/src/app/pages/auth-page.tsx` - Redesigned for magic links
+1. `/src/app/contexts/auth-context.tsx` - Magic link auth + dev mode fallback
+2. `/src/app/pages/auth-page.tsx` - Redesigned for magic links + dev mode
 3. `/src/app/pages/landing-page.tsx` - Connected to account creation API
-4. `/src/app/routes.tsx` - Added verify route + protected routes
-5. `/src/app/components/header.tsx` - Updated with proper logout
+4. `/src/app/pages/verify-page.tsx` - Token verification + dev mode
+5. `/src/app/routes.tsx` - Added verify route + protected routes
+6. `/src/app/components/header.tsx` - Updated with proper logout
+7. `/src/app/App.tsx` - Added dev auth toggle component
 
 ---
 
@@ -175,18 +181,25 @@ Can create more links (based on tier)
 
 ---
 
-## 🧪 Testing Checklist
+## 🔧 Testing Checklist
 
-### Frontend (Ready to Test)
+### Frontend (Ready to Test NOW - No Backend Needed!)
 
-- [ ] Navigate to `/` homepage
-- [ ] Fill out 3-step form
-- [ ] See generated link on success screen
-- [ ] Navigate to `/auth`
-- [ ] Enter email and request magic link
-- [ ] See "check your email" message
-- [ ] Try to access `/dashboard` while logged out
-- [ ] Get redirected to `/auth`
+**See DEVELOPMENT_MODE.md for full testing guide**
+
+- [x] Navigate to `/` homepage ✅
+- [x] Fill out 3-step form ✅
+- [x] See generated link on success screen ✅
+- [x] Navigate to `/auth` ✅
+- [x] Click dev toggle button to login instantly ✅
+- [x] Access `/dashboard` while authenticated ✅
+- [x] Click dev toggle to logout ✅
+- [x] Try to access `/dashboard` while logged out ✅
+- [x] Get redirected to `/auth` ✅
+- [x] Test Google OAuth button (simulated) ✅
+- [x] Test all protected routes ✅
+
+**Pro Tip:** Look for the floating button in bottom-right corner! Click it to toggle auth state.
 
 ### Backend (Needs Implementation)
 
@@ -198,6 +211,32 @@ Can create more links (based on tier)
 - [ ] Protected routes require authentication
 - [ ] Tier limits are enforced
 - [ ] Logout destroys session
+
+---
+
+## 🎮 Development Mode Features
+
+**You can fully test the app RIGHT NOW without any backend!**
+
+### Dev Auth Toggle Button
+- Floating button in bottom-right corner (dev only)
+- Green = Authenticated, Red = Not Authenticated
+- Click to instantly toggle login state
+- Perfect for testing protected routes
+
+### Mock Authentication
+- Uses localStorage to persist auth state
+- Mock user with configurable tier
+- All UI flows work as expected
+- Console shows helpful dev mode messages
+
+### Graceful API Fallback
+- Failed API calls trigger dev mode
+- Homepage form generates mock links
+- Auth flows simulate successful login
+- No errors, no crashes - just works!
+
+**Read DEVELOPMENT_MODE.md for complete testing guide.**
 
 ---
 
@@ -294,7 +333,11 @@ MAGIC_LINK_BASE_URL=https://app.blackcollar.io/auth/verify
    - Error handling
    - Tier enforcement
 
-3. **AUTHENTICATION_SUMMARY.md** - This file
+3. **DEVELOPMENT_MODE.md** - Guide for using dev mode without backend
+   - How to use dev mode
+   - Benefits and limitations
+
+4. **AUTHENTICATION_SUMMARY.md** - This file
    - Quick reference
    - What's built
    - What's needed

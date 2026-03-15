@@ -60,6 +60,12 @@ export function LandingPage() {
         })
       });
 
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Backend not available');
+      }
+
       const data = await response.json();
 
       if (response.ok) {
@@ -72,12 +78,19 @@ export function LandingPage() {
         setError(data.error || 'Failed to create link. Please try again.');
       }
     } catch (err) {
-      console.error('Link creation failed:', err);
-      // For development: generate a mock link if API isn't ready
-      const slug = Math.random().toString(36).substring(2, 8);
-      setGeneratedLink(`links.blackcollar.io/${slug}`);
-      setIsSubmitted(true);
-      console.warn('Using mock link generation - connect to Rails backend for production');
+      // Backend not connected - generate mock link in dev mode
+      if (import.meta.env.DEV) {
+        console.warn('Backend not available. Generating mock link for development.');
+        const slug = Math.random().toString(36).substring(2, 8);
+        setGeneratedLink(`links.blackcollar.io/${slug}`);
+        setIsSubmitted(true);
+        console.log(`🔗 Mock link created: links.blackcollar.io/${slug}`);
+        console.log(`📧 Mock magic link would be sent to: ${formData.email}`);
+        console.log(`💡 In production, user receives email with dashboard access link.`);
+      } else {
+        console.error('Link creation failed:', err);
+        setError('Failed to create link. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
